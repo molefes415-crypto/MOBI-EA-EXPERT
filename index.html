@@ -1,0 +1,1993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#080808">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Mobi EA - Trading Robot Manager</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rubik+Glitch&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #080808;
+      color: #f0f0f0;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+      overscroll-behavior: none;
+      position: fixed;
+      width: 100%;
+      height: 100%;
+    }
+
+    #root {
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: none;
+    }
+
+    .rubik-glitch { font-family: 'Rubik Glitch', cursive !important; }
+    .font-orbitron { font-family: 'Orbitron', sans-serif !important; }
+
+    /* Refined Animations */
+    @keyframes scaleIn { from { transform: scale(0.97); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.04); opacity: 1; } }
+    @keyframes dotPulse { 0%, 100% { transform: scale(1); opacity: 0.4; } 50% { transform: scale(1.1); opacity: 0.8; } }
+    @keyframes splashFade { 0% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; pointer-events: none; } }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes splashLogoIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes splashTextIn { 0% { opacity: 0; transform: translateY(8px); letter-spacing: 10px; } 100% { opacity: 1; transform: translateY(0); letter-spacing: 8px; } }
+    @keyframes splashBarFill { 0% { width: 0%; } 100% { width: 100%; } }
+    @keyframes ringPulse { 0% { transform: scale(0.9); opacity: 0.3; } 50% { transform: scale(1.1); opacity: 0; } 100% { transform: scale(0.9); opacity: 0; } }
+    @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    @keyframes slideInUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes glow { 0%, 100% { box-shadow: 0 0 15px var(--glow-color, rgba(196,30,58,0.2)); } 50% { box-shadow: 0 0 25px var(--glow-color, rgba(196,30,58,0.35)); } }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+    .animate-scale-in { animation: scaleIn 0.3s cubic-bezier(0.16,1,0.3,1); }
+    .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+    .animate-fade-in-up { animation: fadeInUp 0.4s ease-out both; }
+    .animate-pulse { animation: pulse 2s ease-in-out infinite; }
+    .animate-slide-in-right { animation: slideInRight 0.35s cubic-bezier(0.16,1,0.3,1); }
+    .animate-slide-in-up { animation: slideInUp 0.35s cubic-bezier(0.16,1,0.3,1); }
+
+    /* Visual Effects */
+    @keyframes rainFall { 0% { transform: translateY(-10vh) rotate(0deg); opacity:1; } 100% { transform: translateY(110vh) rotate(360deg); opacity:0; } }
+    @keyframes floatUp { 0% { transform: translateY(100vh) scale(0.5); opacity:1; } 100% { transform: translateY(-10vh) scale(1.2); opacity:0; } }
+    @keyframes lightning { 0%,100% { opacity:0; } 10% { opacity:1; } 20% { opacity:0; } 30% { opacity:0.8; } 40% { opacity:0; } }
+    .effect-overlay { position:fixed; inset:0; z-index:300; pointer-events:none; overflow:hidden; }
+    .effect-particle { position:absolute; animation-fill-mode:forwards; }
+    @keyframes scanLine { 0% { top: 0%; } 100% { top: 100%; } }
+    @keyframes scanPulse { 0%,100% { opacity:0.3; } 50% { opacity:1; } }
+    @keyframes symbolFloat { 0% { transform: translateY(-30px) rotate(0deg) scale(1); opacity:0; } 10% { opacity:0.6; } 50% { opacity:0.4; } 90% { opacity:0.15; } 100% { transform: translateY(115vh) rotate(90deg) scale(0.8); opacity:0; } }
+    .symbol-rain-particle { position:absolute; font-weight:700; animation: symbolFloat linear forwards; pointer-events:none; }
+    @keyframes lightningBolt { 0% { opacity:0; } 5% { opacity:1; } 10% { opacity:0.2; } 15% { opacity:0.9; } 25% { opacity:0; } 100% { opacity:0; } }
+    @keyframes candleFall { 0% { transform: translateY(-60px) rotate(0deg); opacity:1; } 100% { transform: translateY(115vh) rotate(45deg); opacity:0; } }
+
+    /* Glass */
+    .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.06); }
+    .glass-strong { background: rgba(12,12,12,0.85); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); border: 1px solid rgba(255,255,255,0.08); }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100; padding: 20px;
+    }
+
+    /* Draggable Icon */
+    .draggable-icon { position: fixed; z-index: 200; cursor: grab; touch-action: none; }
+    .draggable-icon:active { cursor: grabbing; }
+
+    /* Bottom Nav */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(8,8,8,0.82);
+      backdrop-filter: blur(40px);
+      -webkit-backdrop-filter: blur(32px);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      display: flex; justify-content: center; align-items: center;
+      padding: 4px 0 env(safe-area-inset-bottom, 10px); z-index: 50;
+    }
+    .nav-btn {
+      flex: 1; max-width: 110px;
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      padding: 8px 12px; background: transparent; border: none;
+      color: rgba(255,255,255,0.28); font-family: 'Inter'; font-size: 9px; font-weight: 600;
+      letter-spacing: 1.5px; cursor: pointer; transition: all 0.3s ease;
+    }
+    .nav-btn.active { color: #fff; }
+    .nav-btn svg { transition: all 0.3s ease; }
+    .nav-fire-btn {
+      width: 52px; height: 52px; border-radius: 50%;
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: -24px; transition: all 0.3s ease;
+    }
+    .nav-fire-btn:active { transform: scale(0.94); }
+
+    /* Splash Screen */
+    .splash-screen {
+      position: fixed; inset: 0; z-index: 9999;
+      background: #080808;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      animation: splashFade 3.5s ease-in-out forwards;
+    }
+    .splash-ring {
+      position: absolute; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.06);
+      animation: ringPulse 2.5s ease-out infinite;
+    }
+    .splash-logo { animation: splashLogoIn 1s cubic-bezier(0.16,1,0.3,1) 0.2s both; z-index: 2; }
+    .splash-title { animation: splashTextIn 0.8s ease-out 0.5s both; z-index: 2; }
+    .splash-subtitle { animation: fadeInUp 0.6s ease-out 0.9s both; z-index: 2; }
+    .splash-bar-container {
+      width: 160px; height: 2px; background: rgba(255,255,255,0.05);
+      border-radius: 4px; overflow: hidden; margin-top: 40px;
+      animation: fadeIn 0.5s ease-out 1.2s both; z-index: 2;
+    }
+    .splash-bar {
+      height: 100%; border-radius: 4px;
+      animation: splashBarFill 2s ease-in-out 1.2s both;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useMemo, useCallback } = React;
+
+    // ====== SVG Icons (clean, consistent stroke width) ======
+    const HomeIcon = () => (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>);
+    const PlusIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>);
+    const PlayIcon = ({size=20,color="#fff"}) => (<svg width={size} height={size} viewBox="0 0 24 24" fill={color}><polygon points="6 3 20 12 6 21"/></svg>);
+    const SquareIcon = ({size=20,color="white"}) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>);
+    const SparklesIcon = ({color="white"}) => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>);
+    const TrashIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>);
+    const XIcon = ({size=18}) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>);
+    const ArrowLeftIcon = () => (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>);
+    const ArrowRightIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>);
+    const SettingsIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>);
+    const CheckIcon = ({size=20}) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>);
+    const CrownIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M2 4l3 12h14l3-12-5 4-5-4-5 4-5-4z"/><rect x="5" y="18" width="14" height="3" rx="1"/></svg>);
+    const ClockIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>);
+    const CameraIcon = () => (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>);
+    const ChartIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>);
+    const LockIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>);
+    const MicIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" x2="12" y1="19" y2="22"/></svg>);
+
+    // ====== Toast System ======
+    const ToastContext = React.createContext(null);
+    const ToastProvider = ({ children }) => {
+      const [toasts, setToasts] = useState([]);
+      const addToast = (t) => {
+        const id = Date.now();
+        setToasts(prev => [...prev, { ...t, id }]);
+        setTimeout(() => setToasts(prev => prev.filter(x => x.id !== id)), 3000);
+      };
+      return (
+        <ToastContext.Provider value={addToast}>
+          {children}
+          <div style={{ position:'fixed', top:16, left:'50%', transform:'translateX(-50%)', zIndex:999, display:'flex', flexDirection:'column', gap:8, width:'calc(100% - 32px)', maxWidth:380, pointerEvents:'none' }}>
+            {toasts.map(t => (
+              <div key={t.id} className="animate-slide-in-up" style={{
+                background: t.variant === 'destructive' ? 'rgba(220,38,38,0.95)' : 'rgba(22,22,22,0.95)',
+                backdropFilter:'blur(20px)',
+                color:'white', padding:'14px 18px', borderRadius:14, maxWidth:'100%',
+                boxShadow:'0 8px 40px rgba(0,0,0,0.4)',
+                border: t.variant === 'destructive' ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.08)',
+                pointerEvents:'auto'
+              }}>
+                <div style={{fontWeight:600, fontSize:13, marginBottom:2}}>{t.title}</div>
+                <div style={{opacity:0.7, fontSize:12, fontWeight:400}}>{t.description}</div>
+              </div>
+            ))}
+          </div>
+        </ToastContext.Provider>
+      );
+    };
+    const useToast = () => React.useContext(ToastContext);
+
+    // ====== Draggable Bot Icon ======
+    const DraggableBotIcon = ({ image, onClose, onClick, tc }) => {
+      const posRef = useRef({ x: 20, y: window.innerHeight - 160 });
+      const [pos, setPos] = useState(posRef.current);
+      const draggingRef = useRef(false);
+      const startRef = useRef({ x:0, y:0 });
+      const offsetRef = useRef({ x:0, y:0 });
+      const movedRef = useRef(false);
+      const activeRef = useRef(false);
+      const a = tc?.accent || '#C41E3A';
+
+      const handleStart = (cx, cy) => { activeRef.current = true; draggingRef.current = true; movedRef.current = false; startRef.current = {x:cx,y:cy}; offsetRef.current = posRef.current; };
+      const handleMove = (cx, cy) => { if (!draggingRef.current) return; const dx=cx-startRef.current.x; const dy=cy-startRef.current.y; if(Math.abs(dx)>5||Math.abs(dy)>5) movedRef.current=true; const np={x:Math.max(0,Math.min(window.innerWidth-70,offsetRef.current.x+dx)),y:Math.max(0,Math.min(window.innerHeight-70,offsetRef.current.y+dy))}; posRef.current=np; setPos(np); };
+      const handleEnd = () => { draggingRef.current=false; activeRef.current=false; };
+
+      useEffect(() => {
+        const mm=e=>handleMove(e.clientX,e.clientY); const mu=()=>handleEnd();
+        const tm=e=>{e.preventDefault();handleMove(e.touches[0].clientX,e.touches[0].clientY);}; const te=()=>handleEnd();
+        window.addEventListener('mousemove',mm); window.addEventListener('mouseup',mu);
+        window.addEventListener('touchmove',tm,{passive:false}); window.addEventListener('touchend',te);
+        return()=>{window.removeEventListener('mousemove',mm);window.removeEventListener('mouseup',mu);window.removeEventListener('touchmove',tm);window.removeEventListener('touchend',te);};
+      }, []);
+
+      return (
+        <div className="draggable-icon animate-scale-in" style={{left:pos.x,top:pos.y}}
+          onMouseDown={e=>handleStart(e.clientX,e.clientY)} onTouchStart={e=>handleStart(e.touches[0].clientX,e.touches[0].clientY)}>
+          <div style={{width:60,height:60,overflow:'hidden',animation:'float 3s ease-in-out infinite',filter:`drop-shadow(0 0 12px ${tc?.glow||'rgba(196,30,58,0.4)'}) drop-shadow(0 0 24px ${a}88)`}}>
+            <img src="/assets/sitelogo.png" alt="Bot" style={{width:'100%',height:'100%',objectFit:'contain',filter:'invert(1) brightness(2)'}}/>
+          </div>
+        </div>
+      );
+    };
+
+    // ====== Bot Status Popup ======
+    const BotStatusPopup = ({ botName, botImage, onClose, onRemove, onStop, onQuotes, tc }) => {
+      const a = tc?.accent || '#C41E3A';
+      const d = tc?.dark || '#8B0000';
+      const g = tc?.glow || 'rgba(196,30,58,0.5)';
+      const displayName = botName || 'NAVIGATOR SCALPER PRO';
+      return (
+        <div style={{position:'fixed',inset:0,zIndex:150,display:'flex',flexDirection:'column',overflow:'hidden'}} onClick={onClose}>
+          {botImage ? <img src={botImage} alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}/> : <div style={{position:'absolute',inset:0,background:`linear-gradient(160deg,${d},#080808)`}}/>}
+          <div style={{position:'absolute',inset:0,background:`linear-gradient(180deg,rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.3) 40%,${a}22 70%,${a}44 100%)`}}/>
+
+          <div onClick={e=>e.stopPropagation()} style={{position:'relative',zIndex:10,width:'100%',maxWidth:420,margin:'0 auto',display:'flex',flexDirection:'column',alignItems:'center',flex:1,paddingTop:48,paddingBottom:24}} className="animate-fade-in">
+            {/* Avatar */}
+            <div style={{width:80,height:80,borderRadius:'50%',overflow:'hidden',border:`2px solid ${a}80`,boxShadow:`0 0 40px ${g}`,marginBottom:24}}>
+              {botImage ? <img src={botImage} alt="Bot" style={{width:'100%',height:'100%',objectFit:'cover'}}/> : <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:36,background:`linear-gradient(135deg,${a},${d})`}}>🤖</div>}
+            </div>
+
+            {/* Glass card */}
+            <div style={{width:'88%',borderRadius:24,background:'rgba(0,0,0,0.55)',backdropFilter:'blur(32px)',WebkitBackdropFilter:'blur(32px)',border:`1px solid ${a}25`,boxShadow:`0 0 60px ${a}15`,padding:'28px 24px',display:'flex',flexDirection:'column',alignItems:'center',position:'relative',overflow:'hidden'}}>
+              {botImage && <img src={botImage} alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',opacity:0.08,filter:'blur(8px)'}}/>}
+              <div style={{position:'relative',zIndex:2,width:'100%',display:'flex',flexDirection:'column',alignItems:'center'}}>
+                {/* SERVER ONLINE */}
+                <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:20}}>
+                  <div style={{width:8,height:8,borderRadius:'50%',background:'#22c55e',boxShadow:'0 0 12px rgba(34,197,94,0.6)',animation:'breathe 2s ease-in-out infinite'}}/>
+                  <span style={{fontFamily:'Orbitron',fontSize:10,color:'#22c55e',letterSpacing:4,fontWeight:700}}>SERVER ONLINE</span>
+                </div>
+                <h1 className="rubik-glitch" style={{color:'white',fontSize:22,letterSpacing:3,textTransform:'uppercase',textAlign:'center',lineHeight:1.3,marginBottom:24,textShadow:`0 0 40px ${g}`}}>{displayName}</h1>
+                <div style={{display:'flex',gap:12,width:'100%'}}>
+                  <button onClick={e=>{e.stopPropagation();onStop?.();onClose();}} style={{flex:1,padding:'14px 0',borderRadius:12,background:`linear-gradient(135deg,${a},${d})`,border:'none',color:'white',fontFamily:'Orbitron',fontSize:11,fontWeight:700,letterSpacing:2,cursor:'pointer',boxShadow:`0 4px 20px ${g}`}}>STOP EA</button>
+                  <button onClick={e=>{e.stopPropagation();onQuotes?.();onClose();}} style={{flex:1,padding:'14px 0',borderRadius:12,background:'rgba(255,255,255,0.06)',border:`1px solid ${a}40`,color:'white',fontFamily:'Orbitron',fontSize:11,fontWeight:700,letterSpacing:2,cursor:'pointer'}}>SCRIPT</button>
+                </div>
+              </div>
+            </div>
+
+            {/* Status box */}
+            <div style={{width:'88%',marginTop:14,borderRadius:16,background:`linear-gradient(135deg,${a}bb,${d}bb)`,backdropFilter:'blur(8px)',padding:'16px 20px',boxShadow:`0 8px 30px ${g}`}}>
+              <p style={{color:'white',fontSize:10,lineHeight:2.2,fontFamily:'Orbitron',fontWeight:500,letterSpacing:0.5}}>
+                {'>'} {displayName} connected and ready<br/>
+                {'>'} Servers Online — EA Active<br/>
+                {'>'} Analysing chart on Connected Account<br/>
+                {'>'} Waiting for Trade Execution<span className="animate-pulse" style={{color:'white'}}>|</span>
+              </p>
+            </div>
+
+            <div style={{marginTop:'auto',paddingTop:20}}>
+              <p className="rubik-glitch" style={{color:'rgba(255,255,255,0.6)',fontSize:16,letterSpacing:4,textShadow:`0 0 20px ${g}`}}>{displayName}</p>
+            </div>
+            <button onClick={onClose} style={{marginTop:12,background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'50%',width:40,height:40,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'rgba(255,255,255,0.3)'}}><XIcon size={18}/></button>
+          </div>
+        </div>
+      );
+    };
+
+    // ====== Bottom Navigation ======
+    const BottomNav = ({ activeTab, onTabChange, tc }) => {
+      const a = tc?.accent || '#C41E3A';
+      return (
+        <div className="bottom-nav">
+          <button className={`nav-btn ${activeTab==='metatrader'?'active':''}`} onClick={()=>onTabChange('metatrader')} style={activeTab==='metatrader'?{color:a}:{}}>
+            <ChartIcon/>
+            <span style={{textTransform:'uppercase'}}>MetaTrader</span>
+          </button>
+          <button onClick={()=>onTabChange('home')} className="nav-fire-btn" style={{background:`linear-gradient(135deg,${a},${tc?.dark||'#8B0000'})`,boxShadow:`0 4px 24px ${tc?.glow||'rgba(196,30,58,0.4)'}`}}>
+            <HomeIcon/>
+          </button>
+          <button className={`nav-btn ${activeTab==='settings'?'active':''}`} onClick={()=>onTabChange('settings')} style={activeTab==='settings'?{color:a}:{}}>
+            <SettingsIcon/><span style={{textTransform:'uppercase'}}>Settings</span>
+          </button>
+        </div>
+      );
+    };
+
+    // ====== License API (via our own server route, mirrors the edge function) ======
+    const getDeviceId = () => {
+      let d = localStorage.getItem('mobi_ea_device_id');
+      if (!d) { d = 'dev_' + Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem('mobi_ea_device_id', d); }
+      return d;
+    };
+    const validateLicenseAPI = async ({ licenseKey, email, mentorId }) => {
+      try {
+        const resp = await fetch('/api/public/validate-license', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key: licenseKey, deviceId: getDeviceId(), email: email||'', mentorId: mentorId||'' }),
+        });
+        const data = await resp.json().catch(()=>({}));
+        if (!resp.ok || !data.ok) return { ok:false, error: data.error || 'Invalid or expired license' };
+        return {
+          ok: true,
+          robotName: data.robotName,
+          mentorName: data.mentorName,
+          robotImage: data.robotImage || null,
+          symbols: Array.isArray(data.symbols) ? data.symbols : [],
+          version: data.version || 'PRO',
+          licenseKey, email, mentorId,
+        };
+      } catch (err) {
+        return { ok:false, error: 'Could not reach license server. Check your connection.' };
+      }
+    };
+
+    // ====== License Key Modal (used inside app to add another key) ======
+    const LicenseKeyModal = ({ isOpen, onClose, onSuccess, tc }) => {
+      const [key, setKey] = useState('');
+      const [loading, setLoading] = useState(false);
+      const [err, setErr] = useState('');
+      const a = tc?.accent || '#C41E3A';
+      if (!isOpen) return null;
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        if(!key.trim()) return;
+        setLoading(true); setErr('');
+        const stored = JSON.parse(localStorage.getItem('mobi_ea_account') || '{}');
+        const res = await validateLicenseAPI({ licenseKey: key.trim(), email: stored.email||'', mentorId: stored.mentorId||'' });
+        setLoading(false);
+        if(!res.ok){ setErr(res.error); return; }
+        onSuccess(res); setKey(''); onClose();
+      };
+      return (
+        <div style={{position:'fixed',inset:0,zIndex:9999,background:'#f8f8f8',display:'flex',flexDirection:'column'}} className="animate-fade-in">
+          <div style={{padding:'16px'}}>
+            <button onClick={onClose} style={{background:'transparent',border:'none',cursor:'pointer',color:a,padding:8,borderRadius:8}}><ArrowLeftIcon/></button>
+          </div>
+          <div style={{padding:'24px 32px',flex:1}}>
+            <h1 style={{fontSize:24,fontWeight:700,color:'#1a1a1a',textAlign:'center',marginBottom:12}}>License Key</h1>
+            <p style={{fontSize:14,color:'#888',textAlign:'center',marginBottom:36,lineHeight:1.7}}>Enter the license key provided by your mentor.</p>
+            <form onSubmit={handleSubmit}>
+              <input type="text" value={key} onChange={e=>setKey(e.target.value)} placeholder="Enter key here"
+                style={{width:'100%',padding:'16px 20px',border:'2px solid #e5e5e5',borderRadius:12,fontSize:15,color:'#1a1a1a',background:'white',outline:'none',marginBottom:16,boxSizing:'border-box',fontWeight:500}}
+                onFocus={e=>e.target.style.borderColor=a} onBlur={e=>e.target.style.borderColor='#e5e5e5'}/>
+              {err && <p style={{color:'#dc2626',fontSize:13,marginBottom:16,textAlign:'center'}}>{err}</p>}
+              <button type="submit" disabled={loading||!key.trim()} style={{width:'100%',padding:'16px',background:a,color:'white',border:'none',borderRadius:12,fontSize:15,fontWeight:600,cursor:'pointer',opacity:(!key.trim()||loading)?0.5:1,letterSpacing:0.5}}>{loading?'Verifying…':'Authenticate'}</button>
+            </form>
+          </div>
+        </div>
+      );
+    };
+
+    // ====== Subscribe + Activate Gate ======
+    const SubscribeGate = ({ onActivated }) => {
+      const [step, setStep] = useState('subscribe');
+      const [email, setEmail] = useState(()=>{try{return (JSON.parse(localStorage.getItem('mobi_ea_account')||'{}')).email||'';}catch{return '';}});
+      const [mentorId, setMentorId] = useState(()=>{try{return (JSON.parse(localStorage.getItem('mobi_ea_account')||'{}')).mentorId||'';}catch{return '';}});
+      const [licenseKey, setLicenseKey] = useState('');
+      const [loading, setLoading] = useState(false);
+      const [err, setErr] = useState('');
+      const accent = '#C41E3A';
+      const goPay = () => {
+        if(!email.trim()||!mentorId.trim()){setErr('Enter email and mentor ID first.');return;}
+        setErr('');
+        const acct = {email:email.trim(),mentorId:mentorId.trim()};
+        localStorage.setItem('mobi_ea_account', JSON.stringify(acct));
+        // Open checkout in a new tab; user returns to the app immediately.
+        try { window.open('https://mobieaexpert.com/subscribe?email='+encodeURIComponent(email)+'&mentor='+encodeURIComponent(mentorId),'_blank'); } catch(e) {}
+        const stub = { ok:true, robotName:'MOBI EA ROBOT', mentorName:'Mobi EA', expiresAt:null, ...acct, subscribed:true };
+        localStorage.setItem('mobi_ea_license', JSON.stringify(stub));
+        onActivated(stub);
+      };
+      const activate = async (e) => {
+        e.preventDefault(); if(!licenseKey.trim()) return;
+        setLoading(true); setErr('');
+        const res = await validateLicenseAPI({licenseKey:licenseKey.trim(),email,mentorId});
+        setLoading(false);
+        if(!res.ok){setErr(res.error);return;}
+        localStorage.setItem('mobi_ea_license', JSON.stringify(res));
+        onActivated(res);
+      };
+      return (
+        <div style={{position:'fixed',inset:0,zIndex:99999,background:'linear-gradient(180deg,#0a0a0a,#1a0008)',color:'#fff',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:24,overflow:'auto'}}>
+          <div style={{maxWidth:420,width:'100%'}}>
+            <div style={{textAlign:'center',marginBottom:32}}>
+              <h1 className="rubik-glitch" style={{fontSize:34,letterSpacing:6,marginBottom:8,background:'linear-gradient(90deg,#fff,'+accent+')',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>MOBI EA</h1>
+              <p style={{opacity:0.6,fontSize:13,letterSpacing:2}}>TRADING ROBOT MANAGER</p>
+            </div>
+            {step==='subscribe' ? (
+              <div style={{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:20,padding:24,backdropFilter:'blur(20px)'}}>
+                <h2 style={{fontSize:18,fontWeight:700,marginBottom:6}}>Subscribe to continue</h2>
+                <p style={{fontSize:13,opacity:0.6,marginBottom:20}}>Enter your details, complete payment, then activate with the license key your mentor sends you.</p>
+                <label style={{fontSize:11,letterSpacing:2,opacity:0.6}}>EMAIL</label>
+                <input value={email} onChange={e=>setEmail(e.target.value)} type="email" placeholder="you@email.com" style={{width:'100%',padding:'14px 16px',background:'rgba(0,0,0,0.4)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:12,color:'#fff',fontSize:14,marginTop:6,marginBottom:16,outline:'none',boxSizing:'border-box'}}/>
+                <label style={{fontSize:11,letterSpacing:2,opacity:0.6}}>MENTOR ID</label>
+                <input value={mentorId} onChange={e=>setMentorId(e.target.value)} placeholder="Mentor ID" style={{width:'100%',padding:'14px 16px',background:'rgba(0,0,0,0.4)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:12,color:'#fff',fontSize:14,marginTop:6,marginBottom:20,outline:'none',boxSizing:'border-box'}}/>
+                {err && <p style={{color:'#ff6b6b',fontSize:13,marginBottom:12}}>{err}</p>}
+                <button onClick={goPay} style={{width:'100%',padding:16,background:accent,color:'#fff',border:'none',borderRadius:12,fontSize:14,fontWeight:700,letterSpacing:2,cursor:'pointer',boxShadow:'0 8px 24px '+accent+'66'}}>PAY & GET LICENSE</button>
+                <button onClick={()=>setStep('activate')} style={{width:'100%',marginTop:10,padding:12,background:'transparent',color:'#fff',border:'1px solid rgba(255,255,255,0.1)',borderRadius:12,fontSize:12,letterSpacing:2,cursor:'pointer',opacity:0.7}}>I ALREADY HAVE A KEY</button>
+              </div>
+            ) : (
+              <form onSubmit={activate} style={{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:20,padding:24,backdropFilter:'blur(20px)'}}>
+                <h2 style={{fontSize:18,fontWeight:700,marginBottom:6}}>Activate your license</h2>
+                <p style={{fontSize:13,opacity:0.6,marginBottom:20}}>Paste the license key from your mentor.</p>
+                <input value={licenseKey} onChange={e=>setLicenseKey(e.target.value)} placeholder="LICENSE KEY" style={{width:'100%',padding:'14px 16px',background:'rgba(0,0,0,0.4)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:12,color:'#fff',fontSize:14,marginBottom:16,outline:'none',letterSpacing:2,boxSizing:'border-box'}}/>
+                {err && <p style={{color:'#ff6b6b',fontSize:13,marginBottom:12}}>{err}</p>}
+                <button type="submit" disabled={loading||!licenseKey.trim()} style={{width:'100%',padding:16,background:accent,color:'#fff',border:'none',borderRadius:12,fontSize:14,fontWeight:700,letterSpacing:2,cursor:'pointer',opacity:(loading||!licenseKey.trim())?0.5:1}}>{loading?'VERIFYING…':'ACTIVATE'}</button>
+                <button type="button" onClick={()=>setStep('subscribe')} style={{width:'100%',marginTop:10,padding:12,background:'transparent',color:'#fff',border:'1px solid rgba(255,255,255,0.1)',borderRadius:12,fontSize:12,letterSpacing:2,cursor:'pointer',opacity:0.7}}>BACK</button>
+              </form>
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    // ====== Floating Trade Panel (mock orders) ======
+    const FloatingTradePanel = ({ isOpen, onClose, tc }) => {
+      const a = tc?.accent || '#C41E3A';
+      // TODO: replace mock with real MT4/MT5 bridge endpoint
+      const [orders] = useState(() => ([
+        { id:1, symbol:'XAUUSD', type:'BUY',  lots:0.05, entry:2384.20, current:2391.15, openTime:'10:42' },
+        { id:2, symbol:'EURUSD', type:'SELL', lots:0.10, entry:1.0892,  current:1.0871,  openTime:'11:08' },
+        { id:3, symbol:'BTCUSD', type:'BUY',  lots:0.01, entry:67120,   current:66980,   openTime:'12:15' },
+        { id:4, symbol:'US30',   type:'SELL', lots:0.20, entry:39820,   current:39755,   openTime:'13:02' },
+      ]));
+      if(!isOpen) return null;
+      const pl = (o) => {
+        const diff = o.type==='BUY' ? (o.current-o.entry) : (o.entry-o.current);
+        const mult = o.symbol==='XAUUSD'?10:(o.symbol==='BTCUSD'?1:(o.symbol==='US30'?1:10000));
+        return (diff*mult*o.lots).toFixed(2);
+      };
+      return (
+        <div style={{position:'fixed',inset:0,zIndex:99998,background:'rgba(0,0,0,0.6)',display:'flex',alignItems:'flex-end'}} onClick={onClose}>
+          <div onClick={e=>e.stopPropagation()} style={{width:'100%',maxWidth:480,margin:'0 auto',background:'#0e0e10',borderTopLeftRadius:24,borderTopRightRadius:24,padding:20,border:`1px solid ${a}40`,maxHeight:'75vh',overflow:'auto'}}>
+            <div style={{width:40,height:4,background:'rgba(255,255,255,0.2)',borderRadius:2,margin:'0 auto 16px'}}/>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
+              <h3 style={{color:'#fff',fontSize:14,letterSpacing:3,fontWeight:700}}>LIVE TRADES</h3>
+              <span style={{fontSize:11,color:a,letterSpacing:2}}>{orders.length} OPEN</span>
+            </div>
+            {orders.map(o => {
+              const p = parseFloat(pl(o)); const pos = p>=0;
+              return (
+                <div key={o.id} style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:14,padding:14,marginBottom:10,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                  <div>
+                    <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:6}}>
+                      <span style={{color:'#fff',fontWeight:700,fontSize:14}}>{o.symbol}</span>
+                      <span style={{fontSize:10,padding:'2px 8px',borderRadius:6,background:o.type==='BUY'?'#10b98122':'#ef444422',color:o.type==='BUY'?'#10b981':'#ef4444',fontWeight:700,letterSpacing:1}}>{o.type}</span>
+                      <span style={{fontSize:11,color:'rgba(255,255,255,0.4)'}}>{o.lots} lot</span>
+                    </div>
+                    <div style={{fontSize:11,color:'rgba(255,255,255,0.5)'}}>{o.entry} → {o.current} · {o.openTime}</div>
+                  </div>
+                  <div style={{textAlign:'right'}}>
+                    <div style={{color:pos?'#10b981':'#ef4444',fontWeight:700,fontSize:15}}>{pos?'+':''}{p}</div>
+                    <div style={{fontSize:10,color:'rgba(255,255,255,0.4)'}}>USD</div>
+                  </div>
+                </div>
+              );
+            })}
+            <p style={{fontSize:11,color:'rgba(255,255,255,0.3)',textAlign:'center',marginTop:8}}>Demo data — connect MT4/MT5 in MetaTrader tab for live orders</p>
+          </div>
+        </div>
+      );
+    };
+
+    // ====== Bot Settings Modal ======
+    const BotSettingsModal = ({ isOpen, onClose, currentName, currentImage, currentVideo, currentIconImage, onSave, interfaceMode, onInterfaceModeChange }) => {
+      const [name, setName] = useState(currentName);
+      const [previewImage, setPreviewImage] = useState(currentImage);
+      const [previewVideo, setPreviewVideo] = useState(currentVideo);
+      const [previewIcon, setPreviewIcon] = useState(currentIconImage);
+      const mainRef = useRef(null);
+      const iconRef = useRef(null);
+      if (!isOpen) return null;
+      const handleMainMedia = (e) => { const file=e.target.files?.[0]; if(!file) return; const r=new FileReader(); r.onloadend=()=>{if(file.type.startsWith('video/')){setPreviewVideo(r.result);setPreviewImage(null);}else{setPreviewImage(r.result);setPreviewVideo(null);}}; r.readAsDataURL(file); };
+      const handleIconMedia = (e) => { const file=e.target.files?.[0]; if(!file) return; const r=new FileReader(); r.onloadend=()=>setPreviewIcon(r.result); r.readAsDataURL(file); };
+
+      return (
+        <div className="modal-overlay">
+          <div style={{background:'#111',borderRadius:24,padding:28,margin:'0 16px',width:'100%',maxWidth:400,maxHeight:'88vh',overflowY:'auto',border:'1px solid rgba(255,255,255,0.06)'}} className="animate-scale-in">
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:24}}>
+              <h2 style={{fontSize:17,fontWeight:700,color:'white',letterSpacing:0.5}}>Bot Settings</h2>
+              <button onClick={onClose} style={{width:36,height:36,borderRadius:10,background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.08)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'rgba(255,255,255,0.5)'}}><XIcon size={16}/></button>
+            </div>
+            <div style={{marginBottom:20}}>
+              <p style={{fontSize:11,color:'rgba(255,255,255,0.4)',marginBottom:8,fontWeight:500,textAlign:'center'}}>Card Media</p>
+              <div onClick={()=>mainRef.current?.click()} style={{aspectRatio:'1',borderRadius:16,overflow:'hidden',background:'rgba(255,255,255,0.04)',border:'1px dashed rgba(255,255,255,0.1)',cursor:'pointer',maxWidth:200,margin:'0 auto'}}>
+                {previewVideo ? <video src={previewVideo} autoPlay loop muted playsInline style={{width:'100%',height:'100%',objectFit:'cover'}}/> : previewImage ? <img src={previewImage} style={{width:'100%',height:'100%',objectFit:'cover'}}/> : <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',color:'rgba(255,255,255,0.2)',fontSize:28}}>📷</div>}
+              </div>
+              <input ref={mainRef} type="file" accept="image/*,video/*" onChange={handleMainMedia} style={{display:'none'}}/>
+              <p style={{fontSize:10,color:'rgba(255,255,255,0.3)',textAlign:'center',marginTop:10}}>Bot name is set automatically from your license key.</p>
+            </div>
+
+            <button onClick={()=>{onSave(name,previewImage,previewVideo,previewIcon);onClose();}} style={{width:'100%',padding:16,borderRadius:14,background:'linear-gradient(135deg,#C41E3A,#8B0000)',color:'white',border:'none',fontFamily:'Orbitron',fontWeight:700,cursor:'pointer',letterSpacing:1,display:'flex',alignItems:'center',justifyContent:'center',gap:8,fontSize:13,boxShadow:'0 4px 20px rgba(196,30,58,0.3)'}}>
+              <CheckIcon size={16}/> Save Changes
+            </button>
+          </div>
+        </div>
+      );
+    };
+
+    // ====== Execution Flow ======
+    const setupLines = ["SETTING UP MT5...", "ACCEPTING DISCLAIMER...", "LINKING ACCOUNT...."];
+
+    const TypewriterLine = ({ text, onComplete }) => {
+      const [displayed, setDisplayed] = useState("");
+      useEffect(() => {
+        if (displayed.length < text.length) {
+          const timer = setTimeout(() => setDisplayed(text.slice(0, displayed.length + 1)), 50);
+          return () => clearTimeout(timer);
+        } else { onComplete?.(); }
+      }, [displayed, text]);
+      return (
+        <div style={{lineHeight:1.2}}>
+          <span className="rubik-glitch" style={{fontSize:'1.3rem',letterSpacing:'0.04em',color:'#141414'}}>
+            {displayed}{displayed.length < text.length && <span className="animate-pulse">|</span>}
+          </span>
+        </div>
+      );
+    };
+
+    const CircularCountdown = ({ onComplete, tradeData }) => {
+      const TOTAL = 1200;
+      const [seconds, setSeconds] = useState(TOTAL);
+      useEffect(() => { if (seconds > 0) { const t = setTimeout(() => setSeconds(c => c - 1), 1000); return () => clearTimeout(t); } else { onComplete?.(); } }, [seconds]);
+      const radius = 88, stroke = 3, circumference = 2 * Math.PI * radius;
+      const progress = seconds / TOTAL, dashOffset = circumference * (1 - progress);
+      const minutes = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      const angle = progress * 2 * Math.PI - Math.PI / 2;
+      const dotX = 100 + radius * Math.cos(angle), dotY = 100 + radius * Math.sin(angle);
+      const td = tradeData || {};
+      const sym = td.symbol || 'XAUUSDm';
+      const dir = td.direction || 'buy';
+      const entry = td.entry || '5090.67';
+      const lot = td.lotSize || '0.01';
+      const orderNum = '#' + (309304330 + Math.floor(Math.random()*1000));
+      const logLines = [`Setting Up Trade on MT5`, `>>"${orderNum} ${dir} ${lot} ${sym} at ${entry} successful"`, `>>"${orderNum} ${dir} ${lot} ${sym} at ${entry} successful"`];
+      return (
+        <div style={{position:'fixed',inset:0,zIndex:100,display:'flex',flexDirection:'column',background:'#C41E3A'}}>
+          <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'flex-start',paddingTop:40}}>
+            <div style={{position:'relative',width:200,height:200,display:'flex',alignItems:'center',justifyContent:'center'}}>
+              <svg style={{position:'absolute',inset:0,width:'100%',height:'100%',transform:'rotate(-90deg)'}} viewBox="0 0 200 200">
+                <circle cx="100" cy="100" r={radius} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth={stroke}/>
+                <circle cx="100" cy="100" r={radius} fill="none" stroke="white" strokeWidth={stroke} strokeDasharray={circumference} strokeDashoffset={dashOffset} strokeLinecap="round" style={{transition:'all 1s linear'}}/>
+                <circle cx={dotX} cy={dotY} r="6" fill="#22c55e" style={{transition:'all 1s linear'}}/>
+              </svg>
+              <div style={{display:'flex',flexDirection:'column',alignItems:'center',zIndex:10}}>
+                <span style={{color:'rgba(255,255,255,0.5)',fontSize:11,fontFamily:'Orbitron',letterSpacing:3,fontWeight:600}}>MINUTES</span>
+                <span className="rubik-glitch" style={{color:'white',fontSize:44,lineHeight:1}}>{minutes}:{secs.toString().padStart(2,'0')}</span>
+              </div>
+            </div>
+            <span className="rubik-glitch" style={{color:'rgba(0,0,0,0.5)',fontSize:22,letterSpacing:4,marginTop:20}}>EA TORRENT</span>
+          </div>
+          <div style={{flex:1,display:'flex',flexDirection:'column',justifyContent:'flex-end',padding:'0 24px 32px'}}>
+            <div style={{marginBottom:24,textAlign:'center',display:'flex',flexDirection:'column',gap:6}}>
+              {logLines.map((line, i) => <p key={i} className="rubik-glitch" style={{color:'#facc15',fontSize:13,lineHeight:1.4}}>{line}</p>)}
+            </div>
+            <button onClick={onComplete} style={{width:'100%',padding:16,borderRadius:16,background:'white',color:'#C41E3A',border:'none',fontSize:14,fontWeight:700,letterSpacing:2,cursor:'pointer',fontFamily:'Orbitron'}}>COPY LOG</button>
+          </div>
+        </div>
+      );
+    };
+
+    const CSSDotsPattern = () => {
+      const dots = [];
+      for (let r = 0; r < 10; r++) {
+        for (let c = 0; c < 10; c++) {
+          dots.push(React.createElement('div', { key: `${r}-${c}`, style: { width: 6, height: 6, borderRadius: '50%', background: '#C41E3A', opacity: 0.5, animation: `dotPulse 2.5s ease-in-out ${(r*10+c)*0.03}s infinite` } }));
+        }
+      }
+      return React.createElement('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 18, width: 280 } }, dots);
+    };
+
+    const ExecutionFlow = ({ onComplete, tradeData }) => {
+      const [phase, setPhase] = useState("setup");
+      const [currentLine, setCurrentLine] = useState(0);
+      const td = tradeData || {};
+      const dynamicTradeLines = ["ORDER PLACEMENT", "IN PROGRESS", "TRADE AUTOMATED", `>> ${td.symbol||'XAUUSD'}.M`, `${td.direction||'BUY'} TP:${td.tp||'5090.67'}`, `SL:${td.sl||'5042.6'} PLACED`, "ORDER PLACEMENT"];
+      const lines = phase === "setup" ? setupLines : dynamicTradeLines;
+      const handleLineComplete = () => {
+        if (phase==="countdown") return;
+        if (currentLine < lines.length-1) { setTimeout(()=>setCurrentLine(c=>c+1), 350); }
+        else if (phase==="setup") { setTimeout(()=>{setPhase("trades");setCurrentLine(0);}, 500); }
+        else if (phase==="trades") { setTimeout(()=>setPhase("countdown"), 500); }
+      };
+      if (phase==="countdown") return <CircularCountdown onComplete={onComplete} tradeData={tradeData}/>;
+      return (
+        <div style={{position:'fixed',inset:0,zIndex:100,background:'#f5f5f5',display:'flex',flexDirection:'column'}}>
+          <div style={{margin:16,borderRadius:20,background:'#C41E3A',padding:'28px 20px 44px',textAlign:'center'}}>
+            <span className="rubik-glitch" style={{fontSize:'3rem',lineHeight:1,color:'rgba(0,0,0,0.7)'}}>EA TORRENT</span>
+          </div>
+          <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center'}}><CSSDotsPattern/></div>
+          <div style={{padding:'0 16px 28px'}}>
+            <div style={{textAlign:'center',marginBottom:20,display:'flex',flexDirection:'column',gap:4,padding:'0 8px'}}>
+              {lines.map((line, i) => i <= currentLine ? <TypewriterLine key={`${phase}-${i}`} text={line} onComplete={i===currentLine?handleLineComplete:undefined}/> : null)}
+            </div>
+            <button onClick={onComplete} style={{width:'100%',padding:16,borderRadius:16,background:'#1a1a1a',color:'white',border:'none',fontSize:14,fontWeight:700,letterSpacing:2,cursor:'pointer',fontFamily:'Orbitron'}}>RE AUTO TRADE</button>
+          </div>
+        </div>
+      );
+    };
+
+    // ====== Symbol Detail View ======
+    const SymbolDetailView = ({ symbol, initialLotSize="0.02", initialPlatform="MT4", initialNumTrades="9", onBack, onSave, onDelete }) => {
+      const [lotSize, setLotSize] = useState(initialLotSize);
+      const [platform, setPlatform] = useState(initialPlatform);
+      const [numTrades, setNumTrades] = useState(initialNumTrades);
+      const handleSave = () => { onSave({ lotSize, platform, numTrades }); onBack(); };
+      const inputStyle = {width:'100%',border:'1px solid rgba(255,255,255,0.1)',borderRadius:12,padding:'16px 18px',background:'rgba(255,255,255,0.03)',color:'white',fontSize:15,outline:'none',fontWeight:500,boxSizing:'border-box',transition:'border-color 0.3s'};
+      return (
+        <div style={{minHeight:'100vh',background:'rgba(8,8,8,0.75)',backdropFilter:'blur(2px)',display:'flex',flexDirection:'column',position:'relative',zIndex:5}} className="animate-fade-in">
+          <div style={{padding:16,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+            <button onClick={handleSave} style={{background:'transparent',border:'none',cursor:'pointer',color:'rgba(255,255,255,0.5)'}}><ArrowLeftIcon/></button>
+            <h1 style={{fontSize:18,fontWeight:700,color:'white',letterSpacing:2,fontFamily:'Orbitron'}}>{symbol}</h1>
+            <button onClick={onDelete} style={{background:'transparent',border:'none',cursor:'pointer',color:'rgba(255,255,255,0.4)'}}><TrashIcon/></button>
+          </div>
+          <div style={{flex:1,padding:'24px 20px',display:'flex',flexDirection:'column',gap:22}}>
+            {[{label:'Lot Size',value:lotSize,set:setLotSize},{label:'Platform',value:platform,set:setPlatform},{label:'Number of Trades',value:numTrades,set:setNumTrades}].map(f=>(
+              <div key={f.label} style={{position:'relative'}}>
+                <label style={{position:'absolute',top:-9,left:14,background:'rgba(8,8,8,0.95)',padding:'0 8px',fontSize:10,color:'rgba(255,255,255,0.35)',fontFamily:'Orbitron',letterSpacing:1,fontWeight:600}}>{f.label}</label>
+                <input type="text" value={f.value} onChange={e=>f.set(e.target.value)} style={inputStyle}/>
+              </div>
+            ))}
+            <button onClick={handleSave} style={{width:'100%',padding:16,borderRadius:14,background:'linear-gradient(135deg,#C41E3A,#8B0000)',color:'white',border:'none',fontFamily:'Orbitron',fontWeight:700,letterSpacing:2,cursor:'pointer',fontSize:14,boxShadow:'0 4px 20px rgba(196,30,58,0.3)'}}>SAVE</button>
+          </div>
+        </div>
+      );
+    };
+
+    // ====== Quotes View ======
+    const QuotesView = ({ eaName, onBack, botName, isVIP, themeColor }) => {
+      const [activeTab, setActiveTab] = useState('allowed');
+      const [selectedSymbols, setSelectedSymbols] = useState(()=>{
+        try {
+          const saved = JSON.parse(localStorage.getItem('mobi_ea_quote_symbols') || 'null');
+          if (Array.isArray(saved) && saved.length) return saved;
+        } catch {}
+        return [
+          { symbol: 'BTCUSD', lotSize: '0.09', platform: 'MT4', numTrades: '9' },
+          { symbol: 'USDJPY', lotSize: '0.02', platform: 'MT4', numTrades: '9' },
+        ];
+      });
+      const [viewingSymbol, setViewingSymbol] = useState(null);
+      const allSymbols = ['XAUUSD','EURUSD','GBPUSD','USDJPY','AUDUSD','USDCAD','NZDUSD','USDCHF','BTCUSDm','ETHUSD'];
+      useEffect(() => {
+        localStorage.setItem('mobi_ea_quote_symbols', JSON.stringify(selectedSymbols));
+      }, [selectedSymbols]);
+      const toggleSymbol = (symbol) => { const exists=selectedSymbols.find(s=>s.symbol===symbol); if(exists){if(activeTab==='allowed')setViewingSymbol(exists);else setSelectedSymbols(selectedSymbols.filter(s=>s.symbol!==symbol));} else setSelectedSymbols([...selectedSymbols,{symbol,lotSize:'0.02',platform:'MT4',numTrades:'9'}]); };
+      const handleSymbolClick = (symbol) => { const data=selectedSymbols.find(s=>s.symbol===symbol); if(data)setViewingSymbol(data); else if(activeTab==='all')toggleSymbol(symbol); };
+      const handleSave = (data) => { if(viewingSymbol) setSelectedSymbols(selectedSymbols.map(s=>s.symbol===viewingSymbol.symbol?{...s,...data}:s)); };
+      const handleDelete = () => { if(viewingSymbol){setSelectedSymbols(selectedSymbols.filter(s=>s.symbol!==viewingSymbol.symbol));setViewingSymbol(null);} };
+      if (viewingSymbol) return <SymbolDetailView symbol={viewingSymbol.symbol} initialLotSize={viewingSymbol.lotSize} initialPlatform={viewingSymbol.platform} initialNumTrades={viewingSymbol.numTrades} onBack={()=>setViewingSymbol(null)} onSave={handleSave} onDelete={handleDelete}/>;
+
+      const tc = themeColor || (isVIP ? colorMap.blue : colorMap.red);
+      const displayed = activeTab === 'allowed' ? selectedSymbols.map(s => s.symbol) : allSymbols;
+
+      return (
+        <div style={{minHeight:'100vh',background:'rgba(8,8,8,0.75)',backdropFilter:'blur(2px)',display:'flex',flexDirection:'column',paddingBottom:80,position:'relative',zIndex:5}} className="animate-fade-in">
+          <div style={{padding:'16px 16px 14px',display:'flex',alignItems:'center',gap:14,borderBottom:'1px solid rgba(255,255,255,0.05)'}}>
+            <button onClick={onBack} style={{background:'transparent',border:'none',cursor:'pointer',color:'white'}}><ArrowLeftIcon/></button>
+            <h1 style={{fontSize:16,fontWeight:700,letterSpacing:1,color:'white'}}>{botName||eaName}</h1>
+          </div>
+          <div style={{display:'flex',background:'transparent',borderBottom:'1px solid rgba(255,255,255,0.06)'}}>
+            {['allowed','all'].map(tab => (
+              <button key={tab} onClick={()=>setActiveTab(tab)} style={{flex:1,padding:'14px 0',border:'none',borderBottom:activeTab===tab?`2px solid ${tc.accent}`:'2px solid transparent',background:'transparent',color:activeTab===tab?'white':'rgba(255,255,255,0.35)',fontFamily:'Inter',fontSize:13,fontWeight:activeTab===tab?600:400,letterSpacing:0.5,cursor:'pointer',transition:'all 0.3s'}}>
+                {tab==='allowed'?'Allowed':'All Symbols'}
+              </button>
+            ))}
+          </div>
+          <div style={{flex:1,padding:'20px 16px'}}>
+            <div style={{display:'flex',flexDirection:'column',gap:10}}>
+              {displayed.map(symbol => {
+                const isSelected = selectedSymbols.some(s=>s.symbol===symbol);
+                if(activeTab==='allowed' && !isSelected) return null;
+                return (
+                  <button key={symbol} onClick={()=>handleSymbolClick(symbol)} style={{width:'100%',display:'flex',alignItems:'center',gap:14,padding:'16px 18px',borderRadius:14,border:isSelected?`1px solid ${tc.accent}50`:'1px solid rgba(255,255,255,0.06)',background:isSelected?`linear-gradient(135deg,${tc.accent}18,${tc.dark}12)`:'rgba(255,255,255,0.02)',color:'white',cursor:'pointer',transition:'all 0.3s',boxShadow:isSelected?`0 0 25px ${tc.accent}30, 0 0 50px ${tc.accent}15`:'none'}}>
+                    <div style={{width:40,height:40,borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center',background:isSelected?`${tc.accent}20`:'rgba(255,255,255,0.04)',border:`1px solid ${isSelected?tc.accent+'40':'rgba(255,255,255,0.06)'}`,boxShadow:isSelected?`0 0 15px ${tc.accent}40`:'none'}}>
+                      <span style={{fontFamily:'Orbitron',fontSize:11,fontWeight:700,color:isSelected?tc.accent:'rgba(255,255,255,0.3)'}}>{symbol.slice(0,2)}</span>
+                    </div>
+                    <span style={{fontWeight:600,letterSpacing:1.5,fontSize:14,flex:1,textAlign:'left',textShadow:isSelected?`0 0 10px ${tc.accent}30`:'none'}}>{symbol}</span>
+                    {isSelected && <div style={{width:6,height:6,borderRadius:'50%',background:tc.accent,boxShadow:`0 0 12px ${tc.accent}, 0 0 24px ${tc.glow}`}}/>}
+                  </button>
+                );
+              })}
+            </div>
+            {activeTab==='allowed' && selectedSymbols.length===0 && <p style={{textAlign:'center',color:'rgba(255,255,255,0.3)',marginTop:40,fontSize:13}}>No symbols selected. Go to "All Symbols" to add.</p>}
+          </div>
+        </div>
+      );
+    };
+
+    // ====== EA Card (Normal Mode) ======
+    const EACard = ({ name, onTrade, onQuotes, onRemove, onSettings, isActive, customName, customImage, customVideo, tc, tradeDelaySeconds }) => {
+      const displayName = customName || "MOBI EA ROBOT";
+      const a = tc?.accent || '#22d3ee';
+      const d = tc?.dark || '#0e7490';
+      const g = tc?.glow || 'rgba(34,211,238,0.55)';
+      const botImg = customImage || null;
+      return (
+        <div style={{width:'100%',display:'flex',flexDirection:'column',alignItems:'center',paddingTop:18}} className="animate-fade-in">
+          {/* Glass square holographic bot tile */}
+          <div style={{position:'relative',width:228,height:228,marginBottom:22}}>
+            <div style={{position:'absolute',inset:-10,borderRadius:32,background:`radial-gradient(120% 120% at 50% 0%, ${a}30, transparent 60%)`,filter:'blur(8px)'}}/>
+            <div style={{position:'absolute',inset:0,borderRadius:28,background:`linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02) 45%, rgba(0,0,0,0.35))`,border:`1px solid rgba(255,255,255,0.12)`,boxShadow:`inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -40px 80px ${a}18, 0 18px 60px ${a}25, 0 0 0 1px ${a}25`,backdropFilter:'blur(14px)',WebkitBackdropFilter:'blur(14px)',overflow:'hidden'}}>
+              <div style={{position:'absolute',inset:0,backgroundImage:`linear-gradient(${a}10 1px,transparent 1px),linear-gradient(90deg,${a}10 1px,transparent 1px)`,backgroundSize:'22px 22px',opacity:0.35,maskImage:'radial-gradient(circle at 50% 40%, black 40%, transparent 75%)'}}/>
+              <div style={{position:'absolute',top:8,left:8,width:14,height:14,borderTop:`1.5px solid ${a}`,borderLeft:`1.5px solid ${a}`,opacity:0.8}}/>
+              <div style={{position:'absolute',top:8,right:8,width:14,height:14,borderTop:`1.5px solid ${a}`,borderRight:`1.5px solid ${a}`,opacity:0.8}}/>
+              <div style={{position:'absolute',bottom:8,left:8,width:14,height:14,borderBottom:`1.5px solid ${a}`,borderLeft:`1.5px solid ${a}`,opacity:0.8}}/>
+              <div style={{position:'absolute',bottom:8,right:8,width:14,height:14,borderBottom:`1.5px solid ${a}`,borderRight:`1.5px solid ${a}`,opacity:0.8}}/>
+              <div style={{position:'absolute',inset:18,borderRadius:20,overflow:'hidden',background:`linear-gradient(160deg,${a}22,${d}40)`,display:'flex',alignItems:'center',justifyContent:'center'}}>
+                {botImg ? <img src={botImg} alt="Bot" style={{width:'100%',height:'100%',objectFit:'cover',filter:`drop-shadow(0 0 24px ${g})`}}/> : <div style={{fontSize:72,filter:`drop-shadow(0 0 18px ${g})`}}>🤖</div>}
+                {isActive && <div style={{position:'absolute',left:0,right:0,height:2,background:`linear-gradient(90deg,transparent,${a},transparent)`,boxShadow:`0 0 14px ${a}`,animation:'scanLine 2.4s linear infinite'}}/>}
+              </div>
+              <div style={{position:'absolute',left:'50%',bottom:10,transform:'translateX(-50%)',padding:'4px 12px',borderRadius:8,background:'rgba(0,0,0,0.55)',border:`1px solid ${a}40`,fontFamily:'Orbitron',fontSize:9,letterSpacing:2,color:a,fontWeight:700,whiteSpace:'nowrap'}}>MOBI EA · AI</div>
+            </div>
+            {isActive && <div style={{position:'absolute',inset:-3,borderRadius:30,border:`1.5px solid ${a}80`,animation:'breathe 2s ease-in-out infinite',pointerEvents:'none'}}/>}
+          </div>
+
+          <p style={{color:'rgba(255,255,255,0.3)',fontSize:11,letterSpacing:3,marginBottom:8,fontWeight:500,textTransform:'uppercase'}}>Your Trading With</p>
+          <h1 className="rubik-glitch" style={{color:'white',fontSize:26,letterSpacing:3,textTransform:'uppercase',textAlign:'center',lineHeight:1.2,marginBottom:18,padding:'0 28px',textShadow:`0 0 40px ${g}, 0 0 80px ${a}50`}}>{displayName}</h1>
+
+          <div style={{padding:'8px 24px',borderRadius:9999,border:`1px solid ${a}30`,background:`${a}08`,marginBottom:28}}>
+            <span style={{color:'rgba(255,255,255,0.45)',fontSize:11,letterSpacing:2,fontWeight:500}}>Powered by <span style={{color:a,fontWeight:700}}>MOBI EA</span></span>
+          </div>
+
+          {/* 3 Glass Square Action Buttons - distinct styles */}
+          <div style={{display:'flex',alignItems:'stretch',justifyContent:'center',gap:14,marginBottom:28,width:'100%',padding:'0 24px'}}>
+            {[
+              { label:'Remove', icon:<TrashIcon/>, action:onRemove, variant:'ghost' },
+              { label:isActive?'Stop':'Start', icon:isActive?<SquareIcon size={22}/>:<PlayIcon size={22}/>, action:onTrade, variant:'primary' },
+              { label:'Quotes', icon:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>, action:onQuotes, variant:'outline' }
+            ].map(btn=>{
+              const isPrimary = btn.variant==='primary';
+              const isOutline = btn.variant==='outline';
+              return (
+                <button key={btn.label} onClick={btn.action} style={{
+                  flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:8,padding:'16px 8px',
+                  borderRadius:18,cursor:'pointer',transition:'all 0.25s',
+                  background: isPrimary ? `linear-gradient(160deg,${a},${d})` : (isOutline ? 'transparent' : 'rgba(255,255,255,0.03)'),
+                  border: isPrimary ? `1px solid ${a}` : (isOutline ? `1px solid ${a}55` : '1px solid rgba(255,255,255,0.08)'),
+                  color: isPrimary ? 'white' : (isOutline ? a : 'rgba(255,255,255,0.75)'),
+                  boxShadow: isPrimary ? `0 8px 28px ${a}45, inset 0 1px 0 rgba(255,255,255,0.25)` : (isOutline ? `inset 0 0 18px ${a}15` : 'inset 0 1px 0 rgba(255,255,255,0.05)'),
+                  backdropFilter:'blur(8px)',WebkitBackdropFilter:'blur(8px)'
+                }}>
+                  {btn.icon}
+                  <span style={{fontSize:10,fontWeight:700,letterSpacing:2,fontFamily:'Orbitron'}}>{btn.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      );
+    };
+
+    // ====== EA List Item (Normal) ======
+    const EAListItem = ({ name, isSelected, onClick, botImage, tc, isActive }) => {
+      const a = tc?.accent || '#C41E3A';
+      return (
+        <div onClick={onClick} style={{width:'100%',height:72,borderRadius:14,overflow:'hidden',cursor:'pointer',position:'relative',border:isSelected?`1px solid ${a}60`:'1px solid rgba(255,255,255,0.06)',transition:'all 0.3s',background:isSelected?`${a}10`:'rgba(255,255,255,0.02)',boxShadow:isSelected?`0 0 25px ${a}25`:'none'}}>
+          {botImage && <img src={botImage} alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',opacity:0.15}}/>}
+          <div style={{position:'absolute',inset:0,background:'linear-gradient(90deg,rgba(8,8,8,0.85),rgba(8,8,8,0.5))'}}/>
+          <div style={{position:'relative',zIndex:2,height:'100%',display:'flex',alignItems:'center',padding:'0 18px',gap:12}}>
+            <div style={{width:40,height:40,borderRadius:10,overflow:'hidden',background:`${a}15`,flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',border:`1px solid ${a}20`}}>
+              {botImage ? <img src={botImage} style={{width:'100%',height:'100%',objectFit:'cover'}}/> : <span style={{fontSize:18}}>🤖</span>}
+            </div>
+            <div style={{flex:1}}>
+              <span style={{fontWeight:600,color:'white',fontSize:13,display:'block'}}>{name}</span>
+              <div style={{display:'flex',alignItems:'center',gap:6,marginTop:3}}>
+                <div style={{width:5,height:5,borderRadius:'50%',background:isActive?'#22c55e':a,boxShadow:isActive?'0 0 6px rgba(34,197,94,0.5)':'none'}}/>
+                <span style={{fontSize:10,color:isActive?'#22c55e':'rgba(255,255,255,0.35)',fontWeight:600,letterSpacing:1.5,fontFamily:'Orbitron'}}>{isActive?'ACTIVE':'READY'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ====== VIP EA List Item ======
+    const VIPEAListItem = ({ name, isSelected, onClick, botImage, isActive, onRemove, tc }) => {
+      const a = tc?.accent || '#FF0000';
+      const g = tc?.glow || 'rgba(255,0,0,0.9)';
+      return (
+      <div onClick={onClick} style={{display:'flex',alignItems:'center',gap:12,padding:'14px 16px',borderRadius:14,cursor:'pointer',transition:'all 0.3s',background:isSelected?`${a}15`:'rgba(255,255,255,0.02)',border:isSelected?`1px solid ${a}50`:'1px solid rgba(255,255,255,0.05)',boxShadow:isSelected?`0 0 20px ${a}25`:'none'}}>
+        <div style={{width:44,height:44,borderRadius:10,overflow:'hidden',background:`${a}10`,flexShrink:0,border:`1px solid ${a}20`}}>
+          {botImage ? <img src={botImage} alt={name} style={{width:'100%',height:'100%',objectFit:'cover'}}/> : <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:18}}>🤖</div>}
+        </div>
+        <div style={{flex:1}}>
+          <p style={{color:'white',fontWeight:600,fontSize:13}}>{name}</p>
+          <div style={{display:'flex',alignItems:'center',gap:6,marginTop:2}}>
+            <div style={{width:5,height:5,borderRadius:'50%',background:isActive?'#4ade80':`${a}60`}}/>
+            <p style={{fontSize:10,fontWeight:600,color:isActive?'#4ade80':`${a}80`,letterSpacing:1.5,fontFamily:'Orbitron'}}>{isActive?'ACTIVE':'READY'}</p>
+          </div>
+        </div>
+        <button onClick={e=>{e.stopPropagation();onRemove();}} style={{width:32,height:32,borderRadius:8,background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.06)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'rgba(255,255,255,0.3)'}}><XIcon size={14}/></button>
+      </div>
+    );};
+
+    // ====== Normal Home View ======
+    const HomeView = ({ eas, selectedEA, setSelectedEA, onAddEA, onRemoveEA, onStartTrading, showDraggableIcon, botSettings, onOpenSettings, onColorChange, themeColor, onNavigate, onStopTrading, onSwitchMode, onEffect, onChangePic, tradeDelaySeconds, onOpenChartAnalyzer, isListening, voiceTranscript, onToggleVoice }) => {
+      const [isLicenseModalOpen, setIsLicenseModalOpen] = useState(false);
+      const [quotesEA, setQuotesEA] = useState(null);
+      const toast = useToast();
+      const tc = themeColor || colorMap.red;
+      const displayImage = botSettings.image || null;
+      const isVideo = botSettings.video || false;
+      const videoSrc = botSettings.video || null;
+      const handleRemove = (id) => { onRemoveEA(id); toast({ title: "Robot Removed", description: "The robot has been removed.", variant: "destructive" }); };
+      if (quotesEA) return <QuotesView eaName={quotesEA.name} onBack={()=>setQuotesEA(null)} botName={botSettings.name} isVIP={false} themeColor={tc}/>;
+
+      return (
+        <div style={{position:'relative',minHeight:'100vh',overflow:'hidden'}}>
+          {/* Background */}
+          {selectedEA && isVideo && videoSrc ? <video src={videoSrc} autoPlay loop muted playsInline style={{position:'fixed',inset:0,width:'100%',height:'100%',objectFit:'cover',opacity:0.7}}/> : selectedEA && displayImage ? <img src={displayImage} alt="" style={{position:'fixed',inset:0,width:'100%',height:'100%',objectFit:'cover',opacity:0.6}}/> : null}
+          <div style={{position:'fixed',inset:0,background:'linear-gradient(180deg, rgba(8,8,8,0.5) 0%, rgba(8,8,8,0.7) 50%, rgba(8,8,8,0.85) 100%)',zIndex:2}}/>
+
+          <div style={{position:'relative',zIndex:10}}>
+            {/* Header */}
+            <div style={{textAlign:'center',padding:'20px 16px 0'}}>
+              <p className="rubik-glitch" style={{color:'white',fontSize:16,letterSpacing:6,opacity:0.9,textTransform:'uppercase'}}>{(botSettings.mentorName||'Mobi EA').toString().toUpperCase()}</p>
+            </div>
+
+            {selectedEA && (
+              <EACard name={selectedEA.name} onTrade={()=>onStartTrading(selectedEA)} onQuotes={()=>setQuotesEA(selectedEA)} onRemove={()=>handleRemove(selectedEA.id)} onSettings={onOpenSettings} isActive={showDraggableIcon} customName={botSettings.name} customImage={botSettings.image} customVideo={botSettings.video} tc={tc} tradeDelaySeconds={tradeDelaySeconds}/>
+            )}
+
+            <div style={{padding:'20px 16px 120px',display:'flex',flexDirection:'column',gap:10}}>
+              <p style={{color:'rgba(255,255,255,0.3)',fontSize:10,fontWeight:600,letterSpacing:3,marginBottom:4,textTransform:'uppercase'}}>Robot List</p>
+              {eas.map(ea => <EAListItem key={ea.id} name={botSettings.name} isSelected={selectedEA?.id===ea.id} onClick={()=>setSelectedEA(ea)} botImage={botSettings.iconImage||botSettings.image} tc={tc} isActive={showDraggableIcon&&selectedEA?.id===ea.id}/>)}
+              <button onClick={()=>setIsLicenseModalOpen(true)} style={{width:'100%',borderRadius:14,padding:'16px 18px',border:'1px dashed rgba(255,255,255,0.08)',cursor:'pointer',display:'flex',alignItems:'center',gap:12,color:'white',background:'transparent',transition:'all 0.3s'}}>
+                <div style={{width:40,height:40,borderRadius:10,background:`${tc.accent}15`,display:'flex',alignItems:'center',justifyContent:'center',border:`1px solid ${tc.accent}25`,color:tc.accent}}><PlusIcon/></div>
+                <div style={{textAlign:'left',flex:1}}>
+                  <p style={{fontSize:13,fontWeight:600}}>Add Trading Bot</p>
+                  <p style={{fontSize:11,opacity:0.35,marginTop:2}}>Enter licence key to activate</p>
+                </div>
+                <ArrowRightIcon/>
+              </button>
+
+            </div>
+            <LicenseKeyModal isOpen={isLicenseModalOpen} onClose={()=>setIsLicenseModalOpen(false)} onSuccess={onAddEA} tc={tc}/>
+          </div>
+        </div>
+      );
+    };
+
+    // ====== Logs View ======
+    const LogsView = ({ logs, onBack, isVIP, tc }) => {
+      const a = tc?.accent || (isVIP ? '#3b82f6' : '#C41E3A');
+      return (
+        <div style={{minHeight:'100vh',background:'rgba(8,8,8,0.75)',backdropFilter:'blur(2px)',display:'flex',flexDirection:'column',paddingBottom:80,position:'relative',zIndex:5}} className="animate-fade-in">
+          <div style={{padding:'16px',display:'flex',alignItems:'center',gap:14,borderBottom:'1px solid rgba(255,255,255,0.05)'}}>
+            <button onClick={onBack} style={{background:'transparent',border:'none',cursor:'pointer',color:'white'}}><ArrowLeftIcon/></button>
+            <h1 style={{fontSize:16,fontWeight:700,letterSpacing:1,color:'white'}}>Execution Logs</h1>
+          </div>
+          <div style={{padding:16,display:'flex',flexDirection:'column',gap:10}}>
+            {logs.length===0 ? (
+              <div style={{textAlign:'center',padding:48}}>
+                <div style={{color:'rgba(255,255,255,0.15)',marginBottom:12}}><ClockIcon/></div>
+                <p style={{color:'rgba(255,255,255,0.3)',fontSize:13}}>No executions yet</p>
+              </div>
+            ) : logs.slice().reverse().map(log => (
+              <div key={log.id} style={{background:`${a}08`,border:`1px solid ${a}18`,borderRadius:14,padding:'16px 18px'}}>
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
+                  <span style={{color:a,fontFamily:'Orbitron',fontWeight:700,fontSize:13}}>{log.pair}</span>
+                  <span style={{color:'rgba(255,255,255,0.3)',fontSize:11}}>{log.time}</span>
+                </div>
+                <div style={{display:'flex',gap:14,flexWrap:'wrap'}}>
+                  <span style={{color:'#22c55e',fontFamily:'Orbitron',fontSize:11,fontWeight:600}}>{log.action}</span>
+                  <span style={{color:'rgba(255,255,255,0.4)',fontSize:11}}>TP: {log.tp}</span>
+                  <span style={{color:'rgba(255,255,255,0.4)',fontSize:11}}>SL: {log.sl}</span>
+                  <span style={{color:'rgba(255,255,255,0.4)',fontSize:11}}>Lot: {log.lot}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    };
+
+    // ====== VIP Home View ======
+    const VIPHomeView = ({ eas, selectedEA, setSelectedEA, onAddEA, onRemoveEA, onStartTrading, showDraggableIcon, botSettings, onOpenSettings, executionLogs, onColorChange, themeColor, onNavigate, onStopTrading, onSwitchMode, onEffect, onOpenChartAnalyzer }) => {
+      const [isLicenseModalOpen, setIsLicenseModalOpen] = useState(false);
+      const [quotesEA, setQuotesEA] = useState(null);
+      const [showLogs, setShowLogs] = useState(false);
+      const toast = useToast();
+      const displayName = botSettings.name || "PROSPER TRADING ROBOT";
+      const displayImage = botSettings.image || null;
+      const isVideo = botSettings.video || false;
+      const videoSrc = botSettings.video || null;
+      const handleRemove = (id) => { onRemoveEA(id); toast({ title: "Robot Removed", description: "Removed successfully.", variant: "destructive" }); };
+      if (quotesEA) return <QuotesView eaName={quotesEA.name} onBack={()=>setQuotesEA(null)} botName={botSettings.name} isVIP={true} themeColor={themeColor}/>;
+      if (showLogs) return <LogsView logs={executionLogs} onBack={()=>setShowLogs(false)} isVIP={true} tc={themeColor}/>;
+
+      const tc = themeColor || colorMap.red;
+      const a = tc.accent;
+      const d = tc.dark;
+      const g = tc.glow;
+
+      return (
+        <div style={{position:'relative',minHeight:'100vh',overflow:'hidden'}}>
+          {selectedEA && isVideo && videoSrc ? <video src={videoSrc} autoPlay loop muted playsInline style={{position:'fixed',inset:0,width:'100%',height:'100%',objectFit:'cover',opacity:0.3}}/> : selectedEA && displayImage ? <img src={displayImage} alt="" style={{position:'fixed',inset:0,width:'100%',height:'100%',objectFit:'cover',opacity:0.2}}/> : null}
+          <div style={{position:'fixed',inset:0,background:'rgba(8,8,8,0.65)',zIndex:2}}/>
+
+          <div style={{position:'relative',zIndex:10}}>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 18px'}}>
+              <div style={{display:'flex',alignItems:'center',gap:8}}>
+                <span style={{color:'white',fontSize:14,fontWeight:600,textTransform:'uppercase',letterSpacing:1}}>{botSettings.mentorName||'Mobi EA'}</span>
+                <span onClick={()=>onOpenChartAnalyzer?.()} style={{background:`linear-gradient(135deg,${a},${d})`,padding:'3px 10px',borderRadius:10,fontSize:10,fontWeight:700,color:'white',display:'flex',alignItems:'center',gap:3,cursor:'pointer',boxShadow:`0 0 12px ${g}`}}><CrownIcon/> Pro</span>
+              </div>
+              <button onClick={onOpenSettings} style={{width:36,height:36,borderRadius:10,background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.08)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'rgba(255,255,255,0.5)'}}><SettingsIcon/></button>
+            </div>
+
+            {selectedEA && (<>
+              <div style={{display:'flex',justifyContent:'center',paddingTop:20}}>
+                <div style={{width:100,height:100,borderRadius:'50%',padding:3,background:`linear-gradient(135deg,${a},${d})`,boxShadow:`0 0 50px ${g}, 0 0 100px ${a}40`}}>
+                  <div style={{width:'100%',height:'100%',borderRadius:'50%',overflow:'hidden',background:'#111'}}>
+                    {displayImage ? <img src={displayImage} alt={displayName} style={{width:'100%',height:'100%',objectFit:'cover'}}/> : <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:36}}>🤖</div>}
+                  </div>
+                </div>
+              </div>
+
+              <div style={{padding:'0 28px',textAlign:'center',marginTop:20}}>
+                <h2 className="rubik-glitch" style={{fontSize:22,color:'white',textTransform:'uppercase',textShadow:`0 0 30px ${g}, 0 0 60px ${a}50`,letterSpacing:3}}>{displayName}</h2>
+                <p style={{color:`${a}80`,fontSize:12,marginTop:8,fontWeight:500}}>Works 24/7</p>
+              </div>
+
+              <div style={{margin:'28px 20px 0'}}>
+                <div style={{borderRadius:16,padding:'14px 20px',display:'flex',justifyContent:'space-around',alignItems:'center',background:`${a}12`,backdropFilter:'blur(16px)',border:`1px solid ${a}25`,boxShadow:`0 0 30px ${a}15`}}>
+                  {[
+                    {label:'PAIRS',icon:<SparklesIcon color={a}/>,action:()=>selectedEA&&setQuotesEA(selectedEA)},
+                    {label:showDraggableIcon?'STOP':'START',icon:showDraggableIcon?<SquareIcon size={18} color="#f87171"/>:<PlayIcon size={18} color={a}/>,action:()=>selectedEA&&onStartTrading(selectedEA)},
+                    {label:'LOGS',icon:<ClockIcon/>,action:()=>setShowLogs(true)}
+                  ].map(b=>(
+                    <button key={b.label} onClick={b.action} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:6,background:'transparent',border:'none',cursor:'pointer',color:a}}>
+                      {b.icon}<span style={{fontSize:10,fontWeight:700,letterSpacing:2,fontFamily:'Orbitron'}}>{b.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{display:'flex',justifyContent:'center',marginTop:20}}>
+                <div style={{padding:'8px 20px',borderRadius:9999,background:`${a}10`,border:`1px solid ${a}20`}}>
+                  <span style={{color:`${a}80`,fontSize:11,fontWeight:500}}>Powered by <span style={{color:a,fontWeight:700}}>EA CORTEX</span></span>
+                </div>
+              </div>
+            </>)}
+
+            <div style={{padding:'28px 16px 120px',display:'flex',flexDirection:'column',gap:10}}>
+              <p style={{color:`${a}50`,fontSize:10,fontWeight:600,letterSpacing:3,marginBottom:4}}>ROBOT LIST</p>
+              {eas.map(ea => <VIPEAListItem key={ea.id} name={botSettings.name} isSelected={selectedEA?.id===ea.id} onClick={()=>setSelectedEA(ea)} botImage={botSettings.iconImage||botSettings.image} isActive={showDraggableIcon&&selectedEA?.id===ea.id} onRemove={()=>handleRemove(ea.id)} tc={tc}/>)}
+              <button onClick={()=>setIsLicenseModalOpen(true)} style={{width:'100%',borderRadius:14,padding:'16px 18px',display:'flex',alignItems:'center',gap:12,background:'transparent',border:`1px dashed ${a}40`,cursor:'pointer',color:a,transition:'all 0.3s'}}>
+                <div style={{width:40,height:40,borderRadius:10,background:`${a}15`,display:'flex',alignItems:'center',justifyContent:'center'}}><PlusIcon/></div>
+                <span style={{fontWeight:600,fontSize:13}}>Add New Trading Bot</span>
+              </button>
+            </div>
+          </div>
+          <LicenseKeyModal isOpen={isLicenseModalOpen} onClose={()=>setIsLicenseModalOpen(false)} onSuccess={onAddEA} tc={tc}/>
+        </div>
+      );
+    };
+
+    // ====== Color Map ======
+    const colorMap = {
+      red:{ accent:'#FF0000', dark:'#CC0000', glow:'rgba(255,0,0,0.9)' },
+      blue:{ accent:'#0066FF', dark:'#0044FF', glow:'rgba(0,102,255,0.9)' },
+      green:{ accent:'#00FF44', dark:'#00DD33', glow:'rgba(0,255,68,0.9)' },
+      purple:{ accent:'#CC00FF', dark:'#AA00DD', glow:'rgba(204,0,255,0.9)' },
+      orange:{ accent:'#FF6600', dark:'#FF4400', glow:'rgba(255,102,0,0.9)' },
+      pink:{ accent:'#FF0066', dark:'#DD0055', glow:'rgba(255,0,102,0.9)' },
+      yellow:{ accent:'#FFE600', dark:'#FFCC00', glow:'rgba(255,230,0,0.9)' },
+      cyan:{ accent:'#00FFFF', dark:'#00DDFF', glow:'rgba(0,255,255,0.9)' },
+      white:{ accent:'#FFFFFF', dark:'#DDDDDD', glow:'rgba(255,255,255,0.8)' },
+      gold:{ accent:'#FFD700', dark:'#FFAA00', glow:'rgba(255,215,0,0.9)' },
+    };
+
+    // ====== Background Symbol Rain ======
+    const BackgroundSymbolRain = ({ themeColor }) => {
+      const tc = themeColor || { accent:'#FF1744', glow:'rgba(255,23,68,0.7)' };
+      const [particles] = useState(() => {
+        const syms = ['$','€','£','¥','₿','%','#','@','+','×','0','1','∞','◆'];
+        return Array.from({length:35},(_,i)=>{
+          const isBig = Math.random() > 0.7;
+          return { id:i, left:Math.random()*100, delay:Math.random()*25, duration:18+Math.random()*24, size:isBig?22+Math.random()*28:10+Math.random()*14, char:syms[Math.floor(Math.random()*syms.length)], opacity:isBig?0.2+Math.random()*0.2:0.08+Math.random()*0.12, rotate:Math.random()*30-15 };
+        });
+      });
+      return (
+        <div style={{position:'fixed',top:0,left:0,width:'100%',height:'100%',overflow:'hidden',pointerEvents:'none',zIndex:1}}>
+          {particles.map(p => (
+            <span key={p.id} className="symbol-rain-particle" style={{
+              left:p.left+'%', top:'-5%', fontSize:p.size+'px', color:tc.accent,
+              opacity:p.opacity,
+              textShadow:`0 0 16px ${tc.accent}, 0 0 40px ${tc.accent}99, 0 0 60px ${tc.accent}55`,
+              animationDuration:p.duration+'s', animationDelay:p.delay+'s',
+              animationIterationCount:'infinite',
+              transform:`rotate(${p.rotate}deg)`,
+            }}>{p.char}</span>
+          ))}
+        </div>
+      );
+    };
+
+    // ====== Visual Effects Overlay ======
+    const VisualEffectsOverlay = ({ effect, onDone, themeColor }) => {
+      const [particles, setParticles] = useState([]);
+      useEffect(() => {
+        if (!effect) return;
+        if (effect === 'symbolrain') {
+          const syms = ['$','€','£','¥','₹','%','&','#','@'];
+          setParticles(Array.from({length:60},(_,i)=>({id:i,left:Math.random()*100,delay:Math.random()*10,duration:10+Math.random()*16,size:14+Math.random()*28,char:syms[Math.floor(Math.random()*syms.length)],opacity:0.3+Math.random()*0.5})));
+          return;
+        }
+        if (effect === 'candlestickrain') {
+          setParticles(Array.from({length:50},(_,i)=>({id:i,left:Math.random()*100,delay:Math.random()*12,duration:8+Math.random()*14,size:10+Math.random()*18,opacity:0.4+Math.random()*0.5})));
+          return;
+        }
+        const count = effect === 'lightning' ? 3 : 30;
+        setParticles(Array.from({length:count},(_,i)=>({id:i,left:Math.random()*100,delay:Math.random()*2,duration:2+Math.random()*3,size:16+Math.random()*20})));
+        const timer = setTimeout(()=>{setParticles([]);onDone?.();}, 5000);
+        return ()=>clearTimeout(timer);
+      }, [effect]);
+      if (!effect || particles.length === 0) return null;
+      if (effect === 'symbolrain') {
+        const tc = themeColor || colorMap.red;
+        return (
+          <div className="effect-overlay" style={{pointerEvents:'auto'}} onClick={()=>{setParticles([]);onDone?.();}}>
+            {particles.map(p => (<span key={p.id} className="symbol-rain-particle" style={{left:p.left+'%',top:'-5%',fontSize:p.size+'px',color:tc.accent,opacity:p.opacity,textShadow:`0 0 8px ${tc.accent}60`,animationDuration:p.duration+'s',animationDelay:p.delay+'s',animationIterationCount:'infinite'}}>{p.char}</span>))}
+          </div>
+        );
+      }
+      // Candlestick rain effect
+      if (effect === 'candlestickrain') {
+        const tc2 = themeColor || colorMap.red;
+        return (
+          <div className="effect-overlay" style={{pointerEvents:'auto'}} onClick={()=>{setParticles([]);onDone?.();}}>
+            {particles.map(p => {
+              const isGreen = Math.random() > 0.5;
+              const bodyH = 20 + Math.random() * 30;
+              const wickH = 8 + Math.random() * 15;
+              return (
+                <div key={p.id} style={{position:'absolute',left:p.left+'%',top:'-60px',display:'flex',flexDirection:'column',alignItems:'center',animation:`candleFall ${p.duration}s linear ${p.delay}s infinite`,opacity:p.opacity}}>
+                  <div style={{width:1,height:wickH,background:isGreen?'#22c55e':'#ef4444'}}/>
+                  <div style={{width:p.size*0.6,height:bodyH,background:isGreen?'#22c55e':'#ef4444',borderRadius:2,boxShadow:`0 0 8px ${isGreen?'rgba(34,197,94,0.5)':'rgba(239,68,68,0.5)'}`}}/>
+                  <div style={{width:1,height:wickH,background:isGreen?'#22c55e':'#ef4444'}}/>
+                </div>
+              );
+            })}
+          </div>
+        );
+      }
+      const emojiMap = {dollars:'💵',money:'💰',confetti:'🎊',fireworks:'🎆',snow:'❄️',hearts:'❤️',fire:'🔥',stars:'⭐',rockets:'🚀',lightning:'⚡',rain:'💧',diamond:'💎',party:'🥳',trophy:'🏆',bitcoin:'₿'};
+      const emoji = emojiMap[effect] || '✨';
+      const animName = ['fire','rockets','hearts','stars'].includes(effect) ? 'floatUp' : effect==='lightning' ? 'lightning' : 'rainFall';
+      return (
+        <div className="effect-overlay">
+          {effect === 'lightning' && <div style={{position:'absolute',inset:0,background:'white',animation:'lightning 0.5s ease-in-out 3'}}/>}
+          {particles.map(p => (<div key={p.id} className="effect-particle" style={{left:p.left+'%',top:animName==='floatUp'?'auto':'-5%',bottom:animName==='floatUp'?'-5%':'auto',fontSize:p.size+'px',animationName:animName,animationDuration:p.duration+'s',animationDelay:p.delay+'s',animationTimingFunction:'linear'}}>{emoji}</div>))}
+        </div>
+      );
+    };
+
+    // ====== Color Picker Panel ======
+    const FONT_OPTIONS = [
+      { name: 'Rubik Glitch', label: 'Rubik Glitch', family: "'Rubik Glitch', cursive" },
+      { name: 'Orbitron', label: 'Orbitron', family: "'Orbitron', sans-serif" },
+      { name: 'Inter', label: 'Inter', family: "'Inter', sans-serif" },
+      { name: 'Monospace', label: 'Monospace', family: "'Courier New', monospace" },
+      { name: 'Serif', label: 'Serif', family: "Georgia, serif" },
+    ];
+
+    const ColorPickerPanel = ({ isOpen, onClose, onColorChange, currentColor, currentFont, onFontChange, onEffect }) => {
+      if (!isOpen) return null;
+      const colors = Object.entries(colorMap).map(([name,v])=>({name,label:name.charAt(0).toUpperCase()+name.slice(1),...v}));
+      const ac = currentColor ? (colorMap[currentColor]?.accent || '#C41E3A') : '#C41E3A';
+      return (
+        <div style={{position:'fixed',inset:0,zIndex:250,display:'flex'}} className="animate-fade-in">
+          <div onClick={onClose} style={{flex:1,background:'rgba(0,0,0,0.6)',backdropFilter:'blur(4px)'}}/>
+          <div style={{width:'72%',maxWidth:300,background:'#0c0c0c',height:'100%',overflowY:'auto',padding:'28px 20px',display:'flex',flexDirection:'column',gap:24,borderLeft:'1px solid rgba(255,255,255,0.05)'}} className="animate-slide-in-right">
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+              <h2 style={{color:'white',fontSize:15,fontWeight:700,letterSpacing:1}}>Theme</h2>
+              <button onClick={onClose} style={{width:32,height:32,borderRadius:8,background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.06)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'rgba(255,255,255,0.4)'}}><XIcon size={14}/></button>
+            </div>
+
+            <div>
+              <p style={{color:'rgba(255,255,255,0.25)',fontSize:10,letterSpacing:3,fontWeight:600,marginBottom:12,textTransform:'uppercase'}}>Accent Color</p>
+              <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:10}}>
+                {colors.map(c => (
+                  <button key={c.name} onClick={()=>onColorChange({accent:c.accent,dark:c.dark,glow:c.glow},c.name)} style={{
+                    width:'100%',aspectRatio:'1',borderRadius:12,background:`linear-gradient(135deg,${c.accent},${c.dark})`,
+                    border:currentColor===c.name?'2px solid white':'2px solid transparent',
+                    cursor:'pointer',transition:'all 0.3s',
+                    boxShadow:currentColor===c.name?`0 0 16px ${c.glow}`:'none'
+                  }}/>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p style={{color:'rgba(255,255,255,0.25)',fontSize:10,letterSpacing:3,fontWeight:600,marginBottom:12,textTransform:'uppercase'}}>Font</p>
+              <div style={{display:'flex',flexDirection:'column',gap:6}}>
+                {FONT_OPTIONS.map(f => (
+                  <button key={f.name} onClick={()=>onFontChange?.(f.name)} style={{
+                    display:'flex',alignItems:'center',gap:10,padding:'12px 14px',borderRadius:10,
+                    background:currentFont===f.name?`${ac}12`:'transparent',
+                    border:currentFont===f.name?`1px solid ${ac}30`:'1px solid rgba(255,255,255,0.04)',
+                    cursor:'pointer',transition:'all 0.3s'
+                  }}>
+                    <span style={{fontFamily:f.family,fontSize:13,color:currentFont===f.name?ac:'rgba(255,255,255,0.5)',fontWeight:currentFont===f.name?600:400,flex:1,textAlign:'left'}}>{f.label}</span>
+                    {currentFont===f.name && <CheckIcon size={14}/>}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p style={{color:'rgba(255,255,255,0.25)',fontSize:10,letterSpacing:3,fontWeight:600,marginBottom:12,textTransform:'uppercase'}}>Effects</p>
+              <button onClick={()=>{onEffect?.('symbolrain');onClose();}} style={{
+                width:'100%',padding:'14px 16px',borderRadius:12,cursor:'pointer',border:'1px solid rgba(255,255,255,0.06)',
+                background:'rgba(255,255,255,0.02)',display:'flex',alignItems:'center',gap:12,transition:'all 0.3s'
+              }}>
+                <span style={{fontSize:22}}>🌧️</span>
+                <div style={{flex:1,textAlign:'left'}}>
+                  <p style={{fontSize:13,fontWeight:600,color:'white'}}>Symbol Rain</p>
+                  <p style={{fontSize:10,color:'rgba(255,255,255,0.3)',marginTop:2}}>Fullscreen particle effect</p>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ====== MetaTrader View ======
+    const MetaTraderView = ({ isVIP, themeColor }) => {
+      const [activeTab, setActiveTab] = useState('mt5');
+      const [showPw, setShowPw] = useState(false);
+      const [loading, setLoading] = useState(false);
+      const toast = useToast();
+      const [form, setForm] = useState(()=>{try{const s=localStorage.getItem('mt_credentials_mt5');return s?JSON.parse(s):{login:'',password:'',server:''};}catch{return{login:'',password:'',server:''};}});
+      const [connected, setConnected] = useState(()=>{try{return localStorage.getItem('mt_connected_mt5')==='true';}catch{return false;}});
+      const [accountId, setAccountId] = useState(()=>{try{return localStorage.getItem('mt_accountId_mt5')||'';}catch{return '';}});
+      const [accountInfo, setAccountInfo] = useState(null);
+      const [loadingInfo, setLoadingInfo] = useState(false);
+
+      const switchTab = (t) => { localStorage.setItem(`mt_credentials_${activeTab}`,JSON.stringify(form)); localStorage.setItem(`mt_connected_${activeTab}`,connected.toString()); localStorage.setItem(`mt_accountId_${activeTab}`,accountId); setActiveTab(t); try{const s=localStorage.getItem(`mt_credentials_${t}`);setForm(s?JSON.parse(s):{login:'',password:'',server:''});setConnected(localStorage.getItem(`mt_connected_${t}`)==='true');setAccountId(localStorage.getItem(`mt_accountId_${t}`)||'');setAccountInfo(null);}catch{setForm({login:'',password:'',server:''});setConnected(false);setAccountId('');setAccountInfo(null);} };
+
+      const MTAPI_BASE = activeTab === 'mt4' ? 'https://mt4.mtapi.io' : 'https://mt5.mtapi.io';
+
+      const mtapiConnect = async ({ login, password, server }) => {
+        const url = `${MTAPI_BASE}/ConnectEx?user=${encodeURIComponent(login)}&password=${encodeURIComponent(password)}&server=${encodeURIComponent(server)}`;
+        const resp = await fetch(url);
+        const text = await resp.text();
+        let token = text.trim().replace(/^"|"$/g,'');
+        if (!resp.ok || !token || token.toLowerCase().includes('error') || token.toLowerCase().includes('invalid')) {
+          throw new Error(token || `HTTP ${resp.status}`);
+        }
+        return token;
+      };
+
+      const mtapiAccount = async (token) => {
+        const resp = await fetch(`${MTAPI_BASE}/AccountSummary?id=${encodeURIComponent(token)}`);
+        if (!resp.ok) {
+          // Fallback to /Account if AccountSummary not available
+          const r2 = await fetch(`${MTAPI_BASE}/Account?id=${encodeURIComponent(token)}`);
+          if (!r2.ok) throw new Error(`HTTP ${r2.status}`);
+          return r2.json();
+        }
+        return resp.json();
+      };
+
+      const friendlyError = (msg) => {
+        if (!msg) return 'Unknown error occurred.';
+        const m = String(msg);
+        if (/invalid|auth|password|login/i.test(m))
+          return 'Invalid credentials. Check your login ID, password, server name, and selected platform (MT4/MT5).';
+        if (/server|not found|unknown/i.test(m))
+          return 'Server not found. Verify your broker server name matches exactly (case-sensitive).';
+        if (/timeout|network|failed to fetch/i.test(m))
+          return 'Network error reaching MTAPI. Try again in a moment.';
+        return m;
+      };
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!form.login || !form.password || !form.server) return;
+        setLoading(true);
+        try {
+          toast({ title: 'Connecting…', description: `Linking ${activeTab.toUpperCase()} via MTAPI…` });
+          const token = await mtapiConnect(form);
+
+          setAccountId(token);
+          setConnected(true);
+          localStorage.setItem(`mt_credentials_${activeTab}`, JSON.stringify(form));
+          localStorage.setItem(`mt_connected_${activeTab}`, 'true');
+          localStorage.setItem(`mt_accountId_${activeTab}`, token);
+          toast({ title: 'Account Linked!', description: `${activeTab.toUpperCase()} connected via MTAPI.` });
+
+          try {
+            const info = await mtapiAccount(token);
+            setAccountInfo(info);
+          } catch (e) { /* info fetch optional */ }
+        } catch (err) {
+          toast({ title: 'Connection Failed', description: friendlyError(err.message), variant: 'destructive' });
+        }
+        setLoading(false);
+      };
+
+      const fetchAccountInfo = async () => {
+        if (!accountId) return;
+        setLoadingInfo(true);
+        try {
+          const info = await mtapiAccount(accountId);
+          setAccountInfo(info);
+        } catch (err) {
+          toast({ title: 'Error', description: friendlyError(err.message), variant: 'destructive' });
+        }
+        setLoadingInfo(false);
+      };
+
+      const handleDisconnect = () => {
+        setConnected(false); setAccountId(''); setAccountInfo(null);
+        localStorage.removeItem(`mt_connected_${activeTab}`);
+        localStorage.removeItem(`mt_accountId_${activeTab}`);
+        toast({ title: 'Disconnected', description: 'Account unlinked.' });
+      };
+
+      const tc = themeColor || (isVIP ? colorMap.blue : colorMap.red);
+      const a = tc.accent;
+      const d = tc.dark;
+      const g = tc.glow;
+
+      return (
+        <div style={{minHeight:'calc(100vh - 80px)',display:'flex',flexDirection:'column',alignItems:'center',paddingBottom:40,position:'relative',zIndex:5}} className="animate-fade-in">
+          {/* Tabs */}
+          <div style={{display:'flex',gap:0,width:'100%',borderBottom:'1px solid rgba(255,255,255,0.05)'}}>
+            {['mt5','mt4'].map(t => (
+              <button key={t} onClick={()=>switchTab(t)} style={{
+                flex:1,padding:'16px 0',fontFamily:'Orbitron',fontWeight:700,fontSize:11,letterSpacing:3,border:'none',cursor:'pointer',
+                background:'transparent',color:activeTab===t?'white':'rgba(255,255,255,0.25)',
+                borderBottom:activeTab===t?`2px solid ${a}`:'2px solid transparent',transition:'all 0.3s'
+              }}>{t.toUpperCase()} ACCOUNT</button>
+            ))}
+          </div>
+
+          {/* Card */}
+          <div style={{margin:'28px 20px 0',width:'calc(100% - 40px)',maxWidth:400,borderRadius:20,padding:1,background:`linear-gradient(135deg,${a}60,${d}40,${a}30)`,boxShadow:`0 0 40px ${g.replace('0.5','0.15')}`}}>
+            <div style={{background:'rgba(8,8,8,0.85)',backdropFilter:'blur(20px)',borderRadius:19,padding:'28px 24px'}}>
+              {/* Status */}
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:24}}>
+                <div style={{display:'flex',alignItems:'center',gap:8}}>
+                  <div style={{width:8,height:8,borderRadius:'50%',background:connected?'#22c55e':'#ef4444',boxShadow:connected?'0 0 10px rgba(34,197,94,0.5)':'none',animation:connected?'breathe 2s ease-in-out infinite':'none'}}/>
+                  <span style={{fontFamily:'Orbitron',fontSize:10,color:connected?'#22c55e':'rgba(255,255,255,0.35)',letterSpacing:2,fontWeight:600}}>{connected?'CONNECTED VIA METAAPI':'NOT CONNECTED'}</span>
+                </div>
+                {connected && <button onClick={handleDisconnect} style={{background:'rgba(239,68,68,0.1)',border:'1px solid rgba(239,68,68,0.3)',borderRadius:8,padding:'4px 10px',cursor:'pointer',color:'#ef4444',fontSize:9,fontFamily:'Orbitron',fontWeight:600,letterSpacing:1}}>UNLINK</button>}
+              </div>
+
+              {/* Logo */}
+              <div style={{textAlign:'center',marginBottom:12}}>
+                <div style={{width:56,height:56,margin:'0 auto',borderRadius:14,background:`${a}12`,display:'flex',alignItems:'center',justifyContent:'center',border:`1px solid ${a}25`}}>
+                  <span style={{fontSize:24,fontWeight:900,color:a,fontFamily:'Orbitron'}}>{activeTab==='mt5'?'5':'4'}</span>
+                </div>
+              </div>
+
+              <h1 style={{textAlign:'center',color:'white',fontSize:16,fontWeight:700,letterSpacing:2,marginBottom:28,fontFamily:'Orbitron'}}>{activeTab.toUpperCase()} LOGIN</h1>
+
+              {/* Account Info if connected */}
+              {connected && accountInfo && (
+                <div style={{marginBottom:20,borderRadius:12,background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.06)',padding:16}} className="animate-scale-in">
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+                    {[
+                      {l:'Balance',v:'$'+(accountInfo.balance||0).toFixed(2),c:'white'},
+                      {l:'Equity',v:'$'+(accountInfo.equity||0).toFixed(2),c:'#22c55e'},
+                      {l:'Margin',v:'$'+(accountInfo.margin||0).toFixed(2),c:'#eab308'},
+                      {l:'Free Margin',v:'$'+(accountInfo.freeMargin||0).toFixed(2),c:a},
+                    ].map(i=>(
+                      <div key={i.l} style={{textAlign:'center',padding:'10px 0'}}>
+                        <p style={{fontSize:9,color:'rgba(255,255,255,0.3)',letterSpacing:1,marginBottom:4,fontWeight:600}}>{i.l}</p>
+                        <p style={{fontSize:14,fontWeight:800,color:i.c,fontFamily:'Orbitron'}}>{i.v}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <button onClick={fetchAccountInfo} disabled={loadingInfo} style={{width:'100%',marginTop:10,padding:'10px 0',borderRadius:10,background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.06)',color:'rgba(255,255,255,0.5)',fontSize:10,cursor:'pointer',fontFamily:'Orbitron',letterSpacing:1,fontWeight:600}}>
+                    {loadingInfo ? 'Refreshing...' : '↻ Refresh'}
+                  </button>
+                </div>
+              )}
+
+              {connected && !accountInfo && (
+                <button onClick={fetchAccountInfo} disabled={loadingInfo} style={{width:'100%',marginBottom:20,padding:'14px 0',borderRadius:12,background:`${a}10`,border:`1px solid ${a}25`,color:a,fontSize:11,cursor:'pointer',fontFamily:'Orbitron',letterSpacing:2,fontWeight:700}}>
+                  {loadingInfo ? 'Loading...' : 'Fetch Account Info'}
+                </button>
+              )}
+
+              <form onSubmit={handleSubmit} style={{display:'flex',flexDirection:'column',gap:20}}>
+                {[{label:'Login',type:'text',key:'login',ph:'Enter login ID'},{label:'Password',type:showPw?'text':'password',key:'password',ph:'Enter password',pw:true},{label:'Server',type:'text',key:'server',ph:'e.g. AccuMarkets-Live'}].map(f=>(
+                  <div key={f.key} style={{position:'relative'}}>
+                    <label style={{position:'absolute',top:-9,left:14,background:'#111',padding:'0 8px',fontSize:10,color:'rgba(255,255,255,0.3)',fontFamily:'Orbitron',letterSpacing:1,fontWeight:600,zIndex:2}}>{f.label}</label>
+                    <div style={{position:'relative'}}>
+                      <input type={f.type} value={form[f.key]} onChange={e=>setForm({...form,[f.key]:e.target.value})} placeholder={f.ph}
+                        style={{width:'100%',padding:f.pw?'16px 44px 16px 16px':'16px',borderRadius:12,border:'1px solid rgba(255,255,255,0.08)',background:'rgba(255,255,255,0.02)',color:'white',fontSize:14,outline:'none',transition:'border-color 0.3s',letterSpacing:0.5,boxSizing:'border-box'}}
+                        onFocus={e=>e.target.style.borderColor=a} onBlur={e=>e.target.style.borderColor='rgba(255,255,255,0.08)'}/>
+                      {f.pw && <button type="button" onClick={()=>setShowPw(!showPw)} style={{position:'absolute',right:14,top:'50%',transform:'translateY(-50%)',background:'transparent',border:'none',cursor:'pointer',color:'rgba(255,255,255,0.25)',fontSize:16}}>{showPw?'🙈':'👁'}</button>}
+                    </div>
+                  </div>
+                ))}
+                <button type="submit" disabled={loading||!form.login||!form.password||!form.server} style={{
+                  width:'100%',padding:16,borderRadius:14,marginTop:4,
+                  background:loading?'rgba(255,255,255,0.04)':`linear-gradient(135deg,${a},${d})`,
+                  color:'white',border:'none',fontSize:13,letterSpacing:2,cursor:'pointer',fontFamily:'Orbitron',fontWeight:700,
+                  opacity:(!form.login||!form.password||!form.server)?0.35:1,transition:'all 0.3s',
+                  boxShadow:(!form.login||!form.password||!form.server)?'none':`0 4px 24px ${g.replace('0.5','0.25')}`
+                }}>{loading ? 'Connecting via MTAPI...' : connected ? 'Re-Link '+activeTab.toUpperCase() : 'Link '+activeTab.toUpperCase()}</button>
+              </form>
+            </div>
+          </div>
+
+          <div style={{marginTop:20,display:'flex',alignItems:'center',gap:6}}>
+            <LockIcon/>
+            <span style={{fontSize:10,color:'rgba(255,255,255,0.2)',fontWeight:500,letterSpacing:1}}>Secured via MTAPI</span>
+          </div>
+        </div>
+      );
+    };
+
+    // ====== Settings View ======
+    const SettingsView = ({ themeColor, onColorChange, themeName, currentFont, onFontChange, onEffect, onOpenSettings, onOpenChartAnalyzer, botSettings, interfaceMode, onInterfaceModeChange, isListening, voiceTranscript, onToggleVoice }) => {
+      const tc = themeColor || colorMap.red;
+      const a = tc.accent;
+      const sections = [
+        { title:'Bot Settings', desc:'Name, avatar & interface', icon:'⚙️', action:onOpenSettings },
+        { title:'AI Analyzer', desc:'Chart analysis powered by AI', icon:'🧠', action:onOpenChartAnalyzer },
+      ];
+      return (
+        <div style={{padding:'20px 16px',display:'flex',flexDirection:'column',gap:20,minHeight:'calc(100vh - 80px)',position:'relative',zIndex:5}} className="animate-fade-in">
+          <div style={{textAlign:'center',paddingTop:20}}>
+            <div style={{width:52,height:52,borderRadius:14,background:`${a}10`,display:'inline-flex',alignItems:'center',justifyContent:'center',marginBottom:14,color:a,border:`1px solid ${a}20`}}><SettingsIcon/></div>
+            <h1 style={{fontSize:18,fontWeight:700,letterSpacing:2,color:'white'}}>Settings</h1>
+          </div>
+
+          {sections.map(s=>(
+            <button key={s.title} onClick={s.action} style={{width:'100%',padding:'18px',borderRadius:14,background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.06)',cursor:'pointer',display:'flex',alignItems:'center',gap:14,color:'white',transition:'all 0.3s'}}>
+              <span style={{fontSize:22}}>{s.icon}</span>
+              <div style={{textAlign:'left',flex:1}}>
+                <p style={{fontSize:14,fontWeight:600}}>{s.title}</p>
+                <p style={{fontSize:11,opacity:0.35,marginTop:2}}>{s.desc}</p>
+              </div>
+              <ArrowRightIcon/>
+            </button>
+          ))}
+
+          {/* Voice Theme */}
+          <button onClick={onToggleVoice} style={{width:'100%',borderRadius:14,padding:'16px 18px',border:'1px solid rgba(255,255,255,0.06)',cursor:'pointer',display:'flex',alignItems:'center',gap:12,color:'white',background:isListening?'rgba(34,197,94,0.12)':'rgba(255,255,255,0.02)',transition:'all 0.3s'}}>
+            <div style={{width:40,height:40,borderRadius:10,background:isListening?'rgba(34,197,94,0.15)':`${a}10`,display:'flex',alignItems:'center',justifyContent:'center',border:`1px solid ${isListening?'rgba(34,197,94,0.3)':`${a}20`}`}}>
+              <MicIcon color={isListening?'#22c55e':a}/>
+            </div>
+            <div style={{textAlign:'left',flex:1}}>
+              <p style={{fontSize:14,fontWeight:600}}>{isListening?'Listening...':'Voice Theme'}</p>
+              <p style={{fontSize:11,opacity:0.35,marginTop:2}}>{isListening&&voiceTranscript?`"${voiceTranscript}"`:'Say a color to change theme'}</p>
+            </div>
+            {isListening && <div style={{width:8,height:8,borderRadius:'50%',background:'#22c55e',animation:'breathe 1s ease-in-out infinite'}}/>}
+          </button>
+
+          {/* Voice Recording Overlay with Lightning */}
+          {isListening && (
+            <div style={{position:'fixed',inset:0,zIndex:9999,background:'rgba(0,0,0,0.85)',backdropFilter:'blur(20px)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:24,animation:'fadeIn 0.3s ease-out',overflow:'hidden'}} onClick={onToggleVoice}>
+              {/* Lightning bolts in theme color */}
+              {[0,1,2,3,4].map(i => (
+                <svg key={i} style={{position:'absolute',top:0,left:`${10+i*20}%`,width:80,height:'100%',opacity:0,animation:`lightningBolt ${1.2+i*0.3}s ease-in-out ${i*0.7}s infinite`,filter:`drop-shadow(0 0 20px ${a}) drop-shadow(0 0 40px ${a})`}} viewBox="0 0 80 600" fill="none">
+                  <path d={`M${40+Math.sin(i)*15} 0 L${30+i*5} 120 L${50+i*3} 130 L${25+i*4} 280 L${55-i*2} 290 L${20+i*6} 450 L${45+i*2} 460 L${35-i*3} 600`} stroke={a} strokeWidth="3" fill="none"/>
+                  <path d={`M${40+Math.sin(i)*15} 0 L${30+i*5} 120 L${50+i*3} 130 L${25+i*4} 280 L${55-i*2} 290 L${20+i*6} 450 L${45+i*2} 460 L${35-i*3} 600`} stroke="white" strokeWidth="1" fill="none" opacity="0.6"/>
+                </svg>
+              ))}
+              {/* Flash overlay */}
+              <div style={{position:'absolute',inset:0,background:a,animation:'lightningBolt 2s ease-in-out infinite',opacity:0,mixBlendMode:'overlay'}}/>
+              
+              <div style={{position:'relative',zIndex:10}}>
+                <div style={{width:100,height:100,borderRadius:'50%',background:`${a}25`,display:'flex',alignItems:'center',justifyContent:'center',border:`2px solid ${a}80`,animation:'breathe 1.5s ease-in-out infinite',boxShadow:`0 0 40px ${a}, 0 0 80px ${a}60`}}>
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={a} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+                </div>
+                <div style={{position:'absolute',inset:-15,borderRadius:'50%',border:`2px solid ${a}40`,animation:'ringPulse 2s ease-in-out infinite'}}/>
+                <div style={{position:'absolute',inset:-30,borderRadius:'50%',border:`1px solid ${a}20`,animation:'ringPulse 2s ease-in-out infinite 0.5s'}}/>
+              </div>
+              <div style={{textAlign:'center',zIndex:10}}>
+                <p style={{fontSize:22,fontWeight:700,color:a,marginBottom:8,fontFamily:'Orbitron',textShadow:`0 0 20px ${a}`}}>LISTENING</p>
+                <p style={{fontSize:14,color:'rgba(255,255,255,0.7)',fontWeight:500}}>Say a command</p>
+                <p style={{fontSize:11,color:'rgba(255,255,255,0.35)',marginTop:8,lineHeight:1.8}}>🎨 Any color: "red", "purple", "coral"...<br/>🧭 Navigate: "take me to settings"<br/>🕯️ Effects: "rain candlesticks"<br/>🛑 Stop: "stop"</p>
+              </div>
+              {voiceTranscript && <div style={{padding:'10px 24px',borderRadius:12,background:'rgba(255,255,255,0.06)',border:`1px solid ${a}30`,zIndex:10}}><p style={{fontSize:14,color:'rgba(255,255,255,0.6)'}}>"{voiceTranscript}"</p></div>}
+              <p style={{fontSize:12,color:'rgba(255,255,255,0.2)',marginTop:16,zIndex:10}}>Tap anywhere to cancel</p>
+            </div>
+          )}
+
+          {/* Quick Theme */}
+          <div>
+            <p style={{color:'rgba(255,255,255,0.25)',fontSize:10,letterSpacing:3,fontWeight:600,marginBottom:10,textTransform:'uppercase'}}>Quick Theme</p>
+            <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+              {Object.entries(colorMap).map(([name,v])=>(
+                <button key={name} onClick={()=>onColorChange?.({accent:v.accent,dark:v.dark,glow:v.glow},name)} style={{width:36,height:36,borderRadius:10,background:`linear-gradient(135deg,${v.accent},${v.dark})`,border:themeName===name?'2px solid white':'2px solid transparent',cursor:'pointer',transition:'all 0.3s',boxShadow:themeName===name?`0 0 12px ${v.glow}`:'none'}}/>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ====== Chart Analyzer ======
+    const SUPABASE_URL = 'https://paxqglmwckuzviqjkmix.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBheHFnbG13Y2t1enZpcWprbWl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNjE3MzgsImV4cCI6MjA4NjkzNzczOH0.afiMov_IvymKAdSGJ0A3etoP_d5A_iBPoK0icxARGHs';
+    const BASE_SYMBOLS = ['XAUUSD','XAGUSD','EURUSD','GBPUSD','USDJPY','AUDUSD','NZDUSD','USDCAD','USDCHF','EURGBP','EURJPY','GBPJPY','BTCUSD','ETHUSD','US30','US100','USOIL'];
+    const SUFFIXES = ['','m','.m','M','.r','.i'];
+    const ALL_SYMBOLS = []; BASE_SYMBOLS.forEach(s=>{SUFFIXES.forEach(sfx=>ALL_SYMBOLS.push(s+sfx));});
+
+    const ChartAnalyzer = ({ isOpen, onClose, onExecute }) => {
+      const [image, setImage] = useState(null);
+      const [preview, setPreview] = useState(null);
+      const [symbol, setSymbol] = useState('XAUUSD');
+      const [symbolSearch, setSymbolSearch] = useState('');
+      const [showSymbolList, setShowSymbolList] = useState(false);
+      const [analyzing, setAnalyzing] = useState(false);
+      const [result, setResult] = useState(null);
+      const cameraRef = useRef(null);
+      const galleryRef = useRef(null);
+      const toast = useToast();
+      const filteredSymbols = symbolSearch.trim() ? ALL_SYMBOLS.filter(s=>s.toLowerCase().includes(symbolSearch.toLowerCase())).slice(0,20) : BASE_SYMBOLS;
+      const handleFile = (e) => { const file=e.target.files?.[0]; if(!file)return; const r=new FileReader(); r.onloadend=()=>{setPreview(r.result);setImage(r.result);setResult(null);}; r.readAsDataURL(file); };
+      const analyzeChart = async () => {
+        if(!image)return; setAnalyzing(true); setResult(null);
+        try {
+          const resp=await fetch('/api/public/analyze-chart',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageBase64:image,symbol})});
+          if(!resp.ok){const err=await resp.json().catch(()=>({}));throw new Error(err.error||`Error ${resp.status}`);}
+          const r=await resp.json(); setResult(r);
+          toast({title:'Signal Ready',description:`${r.direction} ${symbol} · ${r.confidence}% — tap Execute to place trade`});
+        }
+        catch(err){toast({title:'Analysis Failed',description:err.message,variant:'destructive'});}
+        setAnalyzing(false);
+      };
+      if(!isOpen) return null;
+
+      return (
+        <div style={{position:'fixed',inset:0,zIndex:250,display:'flex'}} className="animate-fade-in">
+          <div onClick={onClose} style={{flex:1,background:'rgba(0,0,0,0.6)',backdropFilter:'blur(4px)'}}/>
+          <div style={{width:'88%',maxWidth:400,background:'#0c0c0c',height:'100%',overflowY:'auto',padding:0,display:'flex',flexDirection:'column',borderLeft:'1px solid rgba(255,255,255,0.05)'}} className="animate-slide-in-right">
+            <div style={{padding:'20px',borderBottom:'1px solid rgba(255,255,255,0.05)'}}>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:10}}>
+                <div style={{display:'flex',alignItems:'center',gap:10}}>
+                  <div style={{width:32,height:32,borderRadius:8,background:'linear-gradient(135deg,#C41E3A,#8B0000)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 0 16px rgba(196,30,58,0.3)'}}><SparklesIcon color="white"/></div>
+                  <div>
+                    <h2 style={{fontFamily:'Orbitron',color:'white',fontSize:13,fontWeight:700,letterSpacing:2}}>AI ANALYZER</h2>
+                    <p style={{fontSize:9,color:'rgba(255,255,255,0.25)',letterSpacing:1}}>Powered by Gemini Vision</p>
+                  </div>
+                </div>
+                <button onClick={onClose} style={{width:32,height:32,borderRadius:8,background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.06)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'rgba(255,255,255,0.3)'}}><XIcon size={14}/></button>
+              </div>
+              <div style={{display:'flex',alignItems:'center',gap:6}}>
+                <div style={{width:5,height:5,borderRadius:'50%',background:'#22c55e',animation:'breathe 2s ease-in-out infinite'}}/>
+                <span style={{fontSize:9,color:'#22c55e',fontFamily:'Orbitron',letterSpacing:2,fontWeight:600}}>ONLINE</span>
+              </div>
+            </div>
+
+            <div style={{padding:20,display:'flex',flexDirection:'column',gap:16,flex:1}}>
+              {/* Symbol */}
+              <div style={{position:'relative'}}>
+                <label style={{fontSize:10,color:'rgba(255,255,255,0.25)',letterSpacing:2,fontWeight:600,marginBottom:8,display:'block',textTransform:'uppercase'}}>Symbol</label>
+                <input type="text" value={showSymbolList?symbolSearch:symbol}
+                  onChange={e=>{setSymbolSearch(e.target.value);setSymbol(e.target.value.toUpperCase());setShowSymbolList(true);}}
+                  onFocus={()=>{setShowSymbolList(true);setSymbolSearch('');}}
+                  onBlur={()=>setTimeout(()=>setShowSymbolList(false),200)}
+                  placeholder="Search..."
+                  style={{width:'100%',padding:'14px 16px',borderRadius:10,background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.06)',color:'white',fontFamily:'Orbitron',fontSize:14,fontWeight:700,outline:'none',boxSizing:'border-box',letterSpacing:2}}/>
+                {showSymbolList && (
+                  <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:10,background:'#151515',border:'1px solid rgba(255,255,255,0.08)',borderRadius:10,marginTop:4,maxHeight:180,overflowY:'auto'}}>
+                    {filteredSymbols.map(s=>(
+                      <button key={s} onClick={()=>{setSymbol(s);setSymbolSearch('');setShowSymbolList(false);}} style={{width:'100%',padding:'10px 16px',background:symbol===s?'rgba(196,30,58,0.1)':'transparent',border:'none',color:symbol===s?'#C41E3A':'rgba(255,255,255,0.5)',fontFamily:'Orbitron',fontSize:11,cursor:'pointer',textAlign:'left',letterSpacing:1}}>{s}</button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Preview */}
+              {preview && (
+                <div style={{borderRadius:12,overflow:'hidden',background:'#0a0a0a',border:'1px solid rgba(255,255,255,0.05)',position:'relative'}}>
+                  <img src={preview} alt="Chart" style={{width:'100%',maxHeight:240,objectFit:'contain',display:'block'}}/>
+                  {analyzing && (
+                    <>
+                      <div style={{position:'absolute',left:0,right:0,height:2,background:`linear-gradient(90deg,transparent,#C41E3A,transparent)`,animation:'scanLine 1.5s linear infinite',boxShadow:'0 0 20px rgba(196,30,58,0.6)'}}/>
+                      <div style={{position:'absolute',top:8,right:8,display:'flex',alignItems:'center',gap:4,background:'rgba(0,0,0,0.8)',padding:'4px 10px',borderRadius:6}}>
+                        <div style={{width:5,height:5,borderRadius:'50%',background:'#C41E3A',animation:'scanPulse 0.8s infinite'}}/>
+                        <span style={{fontSize:9,color:'#C41E3A',fontFamily:'Orbitron',letterSpacing:2,fontWeight:600}}>SCANNING</span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {!preview && (
+                <div style={{display:'flex',gap:10}}>
+                  <button onClick={()=>cameraRef.current?.click()} style={{flex:1,padding:28,borderRadius:14,border:'1px solid rgba(255,255,255,0.06)',background:'rgba(255,255,255,0.02)',cursor:'pointer',display:'flex',flexDirection:'column',alignItems:'center',gap:10}}>
+                    <div style={{width:40,height:40,borderRadius:10,background:'linear-gradient(135deg,#C41E3A,#8B0000)',display:'flex',alignItems:'center',justifyContent:'center'}}><CameraIcon/></div>
+                    <span style={{color:'rgba(255,255,255,0.35)',fontSize:10,fontWeight:600,letterSpacing:1}}>Capture</span>
+                  </button>
+                  <button onClick={()=>galleryRef.current?.click()} style={{flex:1,padding:28,borderRadius:14,border:'1px solid rgba(255,255,255,0.06)',background:'rgba(255,255,255,0.02)',cursor:'pointer',display:'flex',flexDirection:'column',alignItems:'center',gap:10}}>
+                    <div style={{width:40,height:40,borderRadius:10,background:'rgba(255,255,255,0.06)',display:'flex',alignItems:'center',justifyContent:'center',color:'white'}}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                    </div>
+                    <span style={{color:'rgba(255,255,255,0.35)',fontSize:10,fontWeight:600,letterSpacing:1}}>Gallery</span>
+                  </button>
+                </div>
+              )}
+              <input ref={cameraRef} type="file" accept="image/*" capture="environment" onChange={handleFile} style={{display:'none'}}/>
+              <input ref={galleryRef} type="file" accept="image/*" onChange={handleFile} style={{display:'none'}}/>
+
+              {preview && !result && (
+                <button onClick={analyzeChart} disabled={analyzing} style={{width:'100%',padding:16,borderRadius:12,background:analyzing?'rgba(255,255,255,0.04)':'linear-gradient(135deg,#C41E3A,#8B0000)',color:'white',border:analyzing?'1px solid rgba(255,255,255,0.06)':'none',fontSize:12,letterSpacing:2,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:8,fontFamily:'Orbitron',fontWeight:700,boxShadow:analyzing?'none':'0 4px 20px rgba(196,30,58,0.3)'}}>
+                  {analyzing ? <><div style={{width:16,height:16,border:'2px solid rgba(196,30,58,0.2)',borderTop:'2px solid #C41E3A',borderRadius:'50%',animation:'spin 0.8s linear infinite'}}/>Analyzing...</> : <><SparklesIcon/> Scan & Analyze</>}
+                </button>
+              )}
+
+              {result && (
+                <div className="animate-scale-in" style={{background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:14,padding:20}}>
+                  <div style={{display:'flex',justifyContent:'center',marginBottom:20}}>
+                    <span style={{padding:'10px 28px',borderRadius:10,fontFamily:'Orbitron',fontWeight:800,fontSize:16,letterSpacing:3,color:'white',background:result.direction==='BUY'?'linear-gradient(135deg,#22c55e,#16a34a)':'linear-gradient(135deg,#ef4444,#dc2626)',boxShadow:result.direction==='BUY'?'0 4px 16px rgba(34,197,94,0.3)':'0 4px 16px rgba(239,68,68,0.3)'}}>{result.direction}</span>
+                  </div>
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:14}}>
+                    {[{l:'Entry',v:result.entry,c:'white'},{l:'Take Profit',v:result.tp,c:'#22c55e'},{l:'Stop Loss',v:result.sl,c:'#ef4444'},{l:'Lot Size',v:result.lotSize,c:'#eab308'}].map(i=>(
+                      <div key={i.l} style={{background:'rgba(0,0,0,0.3)',borderRadius:10,padding:14,textAlign:'center'}}>
+                        <p style={{fontSize:9,color:'rgba(255,255,255,0.3)',letterSpacing:1,marginBottom:6,fontWeight:600}}>{i.l}</p>
+                        <p style={{fontSize:16,fontWeight:800,color:i.c,fontFamily:'Orbitron'}}>{i.v}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{background:'rgba(0,0,0,0.2)',borderRadius:10,padding:14,marginBottom:14}}>
+                    <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}>
+                      <span style={{fontSize:9,color:'rgba(255,255,255,0.3)',fontWeight:600,letterSpacing:1}}>Confidence</span>
+                      <span style={{fontSize:12,color:result.confidence>70?'#22c55e':'#eab308',fontFamily:'Orbitron',fontWeight:800}}>{result.confidence}%</span>
+                    </div>
+                    <div style={{height:4,background:'rgba(255,255,255,0.04)',borderRadius:4,overflow:'hidden'}}>
+                      <div style={{height:'100%',width:result.confidence+'%',background:result.confidence>70?'#22c55e':'#eab308',borderRadius:4,transition:'width 1s ease-out'}}/>
+                    </div>
+                  </div>
+                  <p style={{fontSize:12,color:'rgba(255,255,255,0.5)',lineHeight:1.6,marginBottom:16}}>{result.analysis}</p>
+                  <button onClick={()=>{onClose();onExecute?.(result,symbol);}} style={{width:'100%',padding:14,borderRadius:12,background:result.direction==='BUY'?'linear-gradient(135deg,#22c55e,#16a34a)':'linear-gradient(135deg,#ef4444,#dc2626)',color:'white',border:'none',fontSize:12,letterSpacing:2,cursor:'pointer',fontFamily:'Orbitron',fontWeight:700,display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>🚀 Execute {result.direction}</button>
+                </div>
+              )}
+              {(preview||result) && <button onClick={()=>{setPreview(null);setImage(null);setResult(null);}} style={{width:'100%',padding:12,borderRadius:10,background:'transparent',border:'1px solid rgba(255,255,255,0.06)',color:'rgba(255,255,255,0.35)',fontSize:11,cursor:'pointer',fontWeight:600,letterSpacing:1}}>↻ New Analysis</button>}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ====== Splash Screen ======
+    const SplashScreen = ({ onComplete }) => {
+      useEffect(() => { const t = setTimeout(() => onComplete(), 3200); return () => clearTimeout(t); }, []);
+      return (
+        <div className="splash-screen">
+          <div className="splash-ring" style={{width:180,height:180}}/>
+          <div className="splash-ring" style={{width:240,height:240,animationDelay:'0.3s'}}/>
+          <div className="splash-ring" style={{width:300,height:300,animationDelay:'0.6s'}}/>
+          <h1 className="splash-title rubik-glitch" style={{color:'white',fontSize:26,zIndex:2,letterSpacing:8}}>MOBI_EA</h1>
+          <p className="splash-subtitle" style={{color:'rgba(255,255,255,0.25)',fontSize:10,letterSpacing:4,marginTop:10,fontFamily:'Orbitron',fontWeight:500}}>AUTO TRADING SYSTEM</p>
+          <div className="splash-bar-container"><div className="splash-bar" style={{background:'linear-gradient(90deg,#C41E3A,#ff4757,#C41E3A)'}}/></div>
+        </div>
+      );
+    };
+
+    // ====== Main App ======
+    const App = () => {
+      const [showSplash, setShowSplash] = useState(true);
+      const [activeTab, setActiveTab] = useState('home');
+      const [eas, setEas] = useState([]);
+      const [selectedEA, setSelectedEA] = useState(null);
+      const [showDraggableIcon, setShowDraggableIcon] = useState(false);
+      const [tradingEA, setTradingEA] = useState(null);
+      const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+      const [showChartAnalyzer, setShowChartAnalyzer] = useState(false);
+      const [tradeData, setTradeData] = useState(null);
+      const [showColorPicker, setShowColorPicker] = useState(false);
+      const [isListening, setIsListening] = useState(false);
+      const [voiceTranscript, setVoiceTranscript] = useState('');
+      const recognitionRef = useRef(null);
+      const toast = useToast();
+
+      // Voice - Record then process (mobile-compatible)
+      const toggleVoiceListening = async () => {
+        if(isListening){
+          recognitionRef.current?.stop();
+          return;
+        }
+        const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+        if(!SR){toast({title:'Not Supported',description:'Speech recognition is not available on this browser.',variant:'destructive'});return;}
+        
+        // CRITICAL: Request mic permission directly in click handler for mobile
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          // Stop the stream immediately - we just needed the permission grant
+          stream.getTracks().forEach(t => t.stop());
+        } catch(err) {
+          toast({title:'Microphone Blocked',description:'Please allow microphone access in your browser settings.',variant:'destructive'});
+          return;
+        }
+        
+        // CSS named colors → hex for ANY color voice command
+        const cssColors = {aliceblue:'#F0F8FF',antiquewhite:'#FAEBD7',aqua:'#00FFFF',aquamarine:'#7FFFD4',azure:'#F0FFFF',beige:'#F5F5DC',bisque:'#FFE4C4',black:'#000000',blanchedalmond:'#FFEBCD',blue:'#0000FF',blueviolet:'#8A2BE2',brown:'#A52A2A',burlywood:'#DEB887',cadetblue:'#5F9EA0',chartreuse:'#7FFF00',chocolate:'#D2691E',coral:'#FF7F50',cornflowerblue:'#6495ED',cornsilk:'#FFF8DC',crimson:'#DC143C',cyan:'#00FFFF',darkblue:'#00008B',darkcyan:'#008B8B',darkgoldenrod:'#B8860B',darkgray:'#A9A9A9',darkgreen:'#006400',darkkhaki:'#BDB76B',darkmagenta:'#8B008B',darkolivegreen:'#556B2F',darkorange:'#FF8C00',darkorchid:'#9932CC',darkred:'#8B0000',darksalmon:'#E9967A',darkseagreen:'#8FBC8F',darkslateblue:'#483D8B',darkslategray:'#2F4F4F',darkturquoise:'#00CED1',darkviolet:'#9400D3',deeppink:'#FF1493',deepskyblue:'#00BFFF',dimgray:'#696969',dodgerblue:'#1E90FF',firebrick:'#B22222',floralwhite:'#FFFAF0',forestgreen:'#228B22',fuchsia:'#FF00FF',gainsboro:'#DCDCDC',ghostwhite:'#F8F8FF',gold:'#FFD700',goldenrod:'#DAA520',gray:'#808080',green:'#008000',greenyellow:'#ADFF2F',honeydew:'#F0FFF0',hotpink:'#FF69B4',indianred:'#CD5C5C',indigo:'#4B0082',ivory:'#FFFFF0',khaki:'#F0E68C',lavender:'#E6E6FA',lavenderblush:'#FFF0F5',lawngreen:'#7CFC00',lemonchiffon:'#FFFACD',lightblue:'#ADD8E6',lightcoral:'#F08080',lightcyan:'#E0FFFF',lightgoldenrodyellow:'#FAFAD2',lightgray:'#D3D3D3',lightgreen:'#90EE90',lightpink:'#FFB6C1',lightsalmon:'#FFA07A',lightseagreen:'#20B2AA',lightskyblue:'#87CEFA',lightslategray:'#778899',lightsteelblue:'#B0C4DE',lightyellow:'#FFFFE0',lime:'#00FF00',limegreen:'#32CD32',linen:'#FAF0E6',magenta:'#FF00FF',maroon:'#800000',mediumaquamarine:'#66CDAA',mediumblue:'#0000CD',mediumorchid:'#BA55D3',mediumpurple:'#9370DB',mediumseagreen:'#3CB371',mediumslateblue:'#7B68EE',mediumspringgreen:'#00FA9A',mediumturquoise:'#48D1CC',mediumvioletred:'#C71585',midnightblue:'#191970',mintcream:'#F5FFFA',mistyrose:'#FFE4E1',moccasin:'#FFE4B5',navajowhite:'#FFDEAD',navy:'#000080',oldlace:'#FDF5E6',olive:'#808000',olivedrab:'#6B8E23',orange:'#FFA500',orangered:'#FF4500',orchid:'#DA70D6',palegoldenrod:'#EEE8AA',palegreen:'#98FB98',paleturquoise:'#AFEEEE',palevioletred:'#DB7093',papayawhip:'#FFEFD5',peachpuff:'#FFDAB9',peru:'#CD853F',pink:'#FF69B4',plum:'#DDA0DD',powderblue:'#B0E0E6',purple:'#800080',rebeccapurple:'#663399',red:'#FF0000',rosybrown:'#BC8F8F',royalblue:'#4169E1',saddlebrown:'#8B4513',salmon:'#FA8072',sandybrown:'#F4A460',seagreen:'#2E8B57',seashell:'#FFF5EE',sienna:'#A0522D',silver:'#C0C0C0',skyblue:'#87CEEB',slateblue:'#6A5ACD',slategray:'#708090',snow:'#FFFAFA',springgreen:'#00FF7F',steelblue:'#4682B4',tan:'#D2B48C',teal:'#008080',thistle:'#D8BFD8',tomato:'#FF6347',turquoise:'#40E0D0',violet:'#EE82EE',wheat:'#F5DEB3',white:'#FFFFFF',whitesmoke:'#F5F5F5',yellow:'#FFFF00',yellowgreen:'#9ACD32'};
+        
+        const hexToHslColor = (hex) => {
+          let r=parseInt(hex.slice(1,3),16)/255, g=parseInt(hex.slice(3,5),16)/255, b=parseInt(hex.slice(5,7),16)/255;
+          const max=Math.max(r,g,b), min=Math.min(r,g,b), l=(max+min)/2;
+          let h=0, s=0;
+          if(max!==min){const d=max-min; s=l>0.5?d/(2-max-min):d/(max+min); switch(max){case r:h=((g-b)/d+(g<b?6:0))/6;break;case g:h=((b-r)/d+2)/6;break;case b:h=((r-g)/d+4)/6;break;}}
+          const accent = hex;
+          // Darken for dark variant
+          const darkR=Math.max(0,parseInt(hex.slice(1,3),16)-40), darkG=Math.max(0,parseInt(hex.slice(3,5),16)-40), darkB=Math.max(0,parseInt(hex.slice(5,7),16)-40);
+          const dark = `#${darkR.toString(16).padStart(2,'0')}${darkG.toString(16).padStart(2,'0')}${darkB.toString(16).padStart(2,'0')}`;
+          return { accent, dark, glow:`rgba(${parseInt(hex.slice(1,3),16)},${parseInt(hex.slice(3,5),16)},${parseInt(hex.slice(5,7),16)},0.9)` };
+        };
+
+        const r=new SR(); r.continuous=false; r.interimResults=true; r.lang='en-US';
+        let finalText='';
+        r.onresult=(event)=>{
+          let t='';
+          for(let i=0;i<event.results.length;i++) t+=event.results[i][0].transcript;
+          finalText=t.trim();
+          setVoiceTranscript(finalText);
+        };
+        r.onend=()=>{
+          setIsListening(false);
+          if(!finalText){setVoiceTranscript('');return;}
+          const lower=finalText.toLowerCase().trim();
+          let matched=false;
+
+          // 1. Navigation commands
+          if(lower.includes('take me to') || lower.includes('go to') || lower.includes('open') || lower.includes('navigate')){
+            if(lower.includes('setting')){setActiveTab('settings');toast({title:'🧭 Navigated',description:'Opened Settings'});matched=true;}
+            else if(lower.includes('home')){setActiveTab('home');toast({title:'🧭 Navigated',description:'Opened Home'});matched=true;}
+            else if(lower.includes('meta') || lower.includes('trader') || lower.includes('trading')){setActiveTab('metatrader');toast({title:'🧭 Navigated',description:'Opened MetaTrader'});matched=true;}
+            if(matched){setTimeout(()=>setVoiceTranscript(''),2000);return;}
+          }
+
+          // 2. Effect commands
+          if(lower.includes('rain') && (lower.includes('candle') || lower.includes('stick'))){
+            setActiveEffect('candlestickrain');
+            toast({title:'🕯️ Candlestick Rain!',description:'Tap to stop'});
+            matched=true;
+            setTimeout(()=>setVoiceTranscript(''),2000);
+            return;
+          }
+          if(lower.includes('lightning') || lower.includes('thunder')){
+            setActiveEffect('lightning');
+            toast({title:'⚡ Lightning!',description:'Say stop to end'});
+            matched=true;
+            setTimeout(()=>setVoiceTranscript(''),2000);
+            return;
+          }
+          if(lower.includes('stop')){
+            setActiveEffect(null);
+            toast({title:'🛑 Stopped',description:'Effect stopped'});
+            matched=true;
+            setTimeout(()=>setVoiceTranscript(''),2000);
+            return;
+          }
+          if(lower.includes('symbol rain') || lower.includes('money rain')){
+            setActiveEffect('symbolrain');
+            toast({title:'💰 Symbol Rain!',description:'Tap to stop'});
+            matched=true;
+            setTimeout(()=>setVoiceTranscript(''),2000);
+            return;
+          }
+
+          // 3. Color: first check preset colorMap
+          for(const c of Object.keys(colorMap)){
+            if(lower.includes(c)){
+              handleColorChange(colorMap[c],c);
+              toast({title:'🎨 Theme Updated',description:`Changed to ${c}`});
+              matched=true;
+              setTimeout(()=>setVoiceTranscript(''),2000);
+              break;
+            }
+          }
+          
+          // 4. If no preset match, try ALL CSS color names
+          if(!matched){
+            const words = lower.replace(/[^a-z ]/g,'').split(/\s+/);
+            for(const word of words){
+              if(cssColors[word]){
+                const tc = hexToHslColor(cssColors[word]);
+                handleColorChange(tc, word);
+                toast({title:'🎨 Theme Updated',description:`Changed to ${word}`});
+                matched=true;
+                setTimeout(()=>setVoiceTranscript(''),2000);
+                break;
+              }
+            }
+            // Try multi-word CSS colors (e.g. "dark blue" → "darkblue")
+            if(!matched){
+              const joined = lower.replace(/[^a-z]/g,'');
+              for(const [name, hex] of Object.entries(cssColors)){
+                if(joined.includes(name)){
+                  const tc = hexToHslColor(hex);
+                  handleColorChange(tc, name);
+                  toast({title:'🎨 Theme Updated',description:`Changed to ${name}`});
+                  matched=true;
+                  setTimeout(()=>setVoiceTranscript(''),2000);
+                  break;
+                }
+              }
+            }
+          }
+          
+          if(!matched){
+            toast({title:'Command Not Recognized',description:`Heard: "${finalText}". Try a color, "take me to settings", or "rain candlesticks"`,variant:'destructive'});
+            setTimeout(()=>setVoiceTranscript(''),3000);
+          }
+        };
+        r.onerror=(e)=>{setIsListening(false);setVoiceTranscript('');if(e.error!=='aborted'&&e.error!=='no-speech')toast({title:'Voice Error',description:e.error,variant:'destructive'});};
+        r.start(); recognitionRef.current=r; setIsListening(true);
+        toast({title:'🎙️ Recording...',description:'Say a command, then wait'});
+      };
+
+      const [appFont, setAppFont] = useState(()=>{try{return localStorage.getItem('appFont')||'Rubik Glitch';}catch{return 'Rubik Glitch';}});
+      const handleFontChange = (fontName) => { setAppFont(fontName); localStorage.setItem('appFont',fontName); const f=FONT_OPTIONS.find(fo=>fo.name===fontName); if(f)document.body.style.fontFamily=f.family; };
+      useEffect(()=>{const f=FONT_OPTIONS.find(fo=>fo.name===appFont);if(f)document.body.style.fontFamily=f.family;}, []);
+
+      // Swipe
+      const touchStartRef = useRef(null);
+      useEffect(()=>{
+        const ts=e=>{touchStartRef.current={x:e.touches[0].clientX,y:e.touches[0].clientY};};
+        const te=e=>{if(!touchStartRef.current)return;const dx=e.changedTouches[0].clientX-touchStartRef.current.x;const dy=e.changedTouches[0].clientY-touchStartRef.current.y;if(dx<-80&&Math.abs(dy)<100)setShowColorPicker(true);touchStartRef.current=null;};
+        window.addEventListener('touchstart',ts,{passive:true});window.addEventListener('touchend',te);
+        return()=>{window.removeEventListener('touchstart',ts);window.removeEventListener('touchend',te);};
+      }, []);
+
+      const [themeColor, setThemeColor] = useState(()=>{try{const s=localStorage.getItem('appThemeColor');return s?JSON.parse(s):null;}catch{return null;}});
+      const [themeName, setThemeName] = useState(()=>{try{return localStorage.getItem('appThemeName')||'';}catch{return '';}});
+      const handleColorChange = (color,name) => { setThemeColor(color); setThemeName(name); localStorage.setItem('appThemeColor',JSON.stringify(color)); localStorage.setItem('appThemeName',name); };
+
+      const [activeEffect, setActiveEffect] = useState(null);
+      // License gate state
+      const [license, setLicense] = useState(()=>{try{const s=localStorage.getItem('mobi_ea_license');return s?JSON.parse(s):null;}catch{return null;}});
+      const [showTradePanel, setShowTradePanel] = useState(false);
+
+      const [botSettings, setBotSettings] = useState(()=>{
+        try {
+          const s=localStorage.getItem('botSettings');
+          if(s) return JSON.parse(s);
+        } catch{}
+        const lic = (()=>{try{return JSON.parse(localStorage.getItem('mobi_ea_license')||'null');}catch{return null;}})();
+        return { name: (lic?.robotName)||"MOBI EA ROBOT", mentorName:(lic?.mentorName)||"Mobi EA", image:null, video:null, iconImage:null };
+      });
+      const [interfaceMode, setInterfaceMode] = useState(()=>{try{return localStorage.getItem('interfaceMode')||'normal';}catch{return 'normal';}});
+      useEffect(()=>{localStorage.setItem('interfaceMode',interfaceMode);},[interfaceMode]);
+      useEffect(()=>{if(eas.length>0&&!selectedEA)setSelectedEA(eas[0]);},[eas,selectedEA]);
+
+      // When license activates, seed bot settings + first EA from API
+      const handleActivated = (res) => {
+        setLicense(res);
+        const s = { name: res.robotName, mentorName: res.mentorName, image:null, video:null, iconImage:null };
+        setBotSettings(s); localStorage.setItem('botSettings', JSON.stringify(s));
+        const ea = { id: Date.now().toString(), name: res.robotName, version:'PRO', source:'MOBI_EA', licenseKey: res.licenseKey };
+        setEas([ea]); setSelectedEA(ea);
+      };
+
+      const handleAddEA = (resOrKey) => {
+        const res = typeof resOrKey === 'string' ? { licenseKey: resOrKey, robotName:'MOBI EA ROBOT', mentorName:'Mobi EA' } : resOrKey;
+        const ea = { id: Date.now().toString(), name: res.robotName||'MOBI EA ROBOT', version:'PRO', source:'MOBI_EA', licenseKey: res.licenseKey };
+        setEas(p=>[...p, ea]); setSelectedEA(ea);
+      };
+      const handleRemoveEA = (id) => { const r=eas.filter(e=>e.id!==id); setEas(r); setShowDraggableIcon(false); setTradingEA(null); if(selectedEA?.id===id) setSelectedEA(r.length>0?r[0]:null); };
+
+      const [showExecution, setShowExecution] = useState(false);
+      const [showBotPopup, setShowBotPopup] = useState(false);
+      const [executionLogs, setExecutionLogs] = useState([]);
+      const speakText = (text) => { if('speechSynthesis' in window){const u=new SpeechSynthesisUtterance(text);u.rate=0.95;u.pitch=1.1;window.speechSynthesis.speak(u);} };
+      const [tradeDelayTimer, setTradeDelayTimer] = useState(null);
+      const [tradeDelaySeconds, setTradeDelaySeconds] = useState(0);
+
+      const handleStartTrading = (ea) => {
+        if(showDraggableIcon||tradeDelayTimer){
+          if(tradeDelayTimer){clearInterval(tradeDelayTimer);setTradeDelayTimer(null);setTradeDelaySeconds(0);}
+          setShowDraggableIcon(false);setShowExecution(false);setShowBotPopup(false);setTradingEA(null);
+          toast({title:"Stopped",description:"Trading robot stopped."});
+        } else {
+          speakText("Trade will execute in 20 minutes!");
+          setShowDraggableIcon(true);setTradeDelaySeconds(1200);
+          const interval=setInterval(()=>{setTradeDelaySeconds(prev=>{if(prev<=1){clearInterval(interval);setTradeDelayTimer(null);setShowExecution(true);return 0;}return prev-1;});},1000);
+          setTradeDelayTimer(interval);
+          toast({title:"Scheduled",description:"Execution in 20 minutes."});
+        }
+      };
+
+      const handleFullStop = () => { setShowDraggableIcon(false); setShowBotPopup(false); setTradingEA(null); toast({title:"Stopped",description:"Trading robot stopped."}); };
+      const handleIconClick = () => { /* disabled - icon does nothing on press */ };
+      const mtapiOrderSend = async ({ base, token, symbol, operation, volume, sl, tp, comment }) => {
+        const params = new URLSearchParams({
+          id: token,
+          symbol,
+          operation, // 'Buy' or 'Sell'
+          volume: String(volume),
+          placedType: 'Instant',
+          slippage: '10',
+          comment: comment || 'Mobi EA',
+        });
+        if (sl) params.append('stoploss', String(sl));
+        if (tp) params.append('takeprofit', String(tp));
+        const url = `${base}/OrderSend?${params.toString()}`;
+        const resp = await fetch(url, { method: 'GET' });
+        const text = await resp.text();
+        let data; try { data = JSON.parse(text); } catch { data = text; }
+        if (!resp.ok) throw new Error(typeof data === 'string' ? data : (data?.message || `HTTP ${resp.status}`));
+        if (data && typeof data === 'object') {
+          const code = String(data.code || '').toUpperCase();
+          const message = String(data.message || '');
+          const hasTicket = data.ticket !== undefined && data.ticket !== null && String(data.ticket) !== '';
+          const explicitFailure = data.success === false || /ERROR|INVALID|REJECT|DENIED|FAILED|NOT_ENOUGH|MARKET_CLOSED|NO_MONEY|OFF_QUOTES|TRADE_DISABLED/.test(code);
+          const textualFailure = /error|invalid|reject|denied|failed|not enough|market closed|off quotes|disabled|cannot/i.test(message);
+          if (!hasTicket && (explicitFailure || textualFailure)) {
+            throw new Error(message || code || 'Trade was rejected by broker.');
+          }
+        }
+        return data;
+      };
+
+      const normalizeMtapiOrder = (order) => {
+        if (!order || typeof order !== 'object') return null;
+        return {
+          symbol: String(order.symbol || order.Symbol || '').toUpperCase(),
+          comment: String(order.comment || order.Comment || '').trim(),
+          ticket: order.ticket ?? order.Ticket ?? order.order ?? order.Order ?? null,
+          volume: Number(order.volume ?? order.Volume ?? order.lots ?? order.Lots ?? 0),
+          raw: order,
+        };
+      };
+
+      const mtapiOpenedOrders = async ({ base, token }) => {
+        const resp = await fetch(`${base}/OpenedOrders?id=${encodeURIComponent(token)}`, { method: 'GET' });
+        const text = await resp.text();
+        let data; try { data = JSON.parse(text); } catch { data = text; }
+        if (!resp.ok) throw new Error(typeof data === 'string' ? data : (data?.message || `HTTP ${resp.status}`));
+        if (data && typeof data === 'object' && !Array.isArray(data) && data.message && data.code) {
+          throw new Error(data.message || 'Could not verify open orders.');
+        }
+        return Array.isArray(data) ? data.map(normalizeMtapiOrder).filter(Boolean) : [];
+      };
+
+      const verifyMtapiOrder = async ({ base, token, symbol, comment, expectedVolume }) => {
+        const targetSymbol = String(symbol || '').toUpperCase();
+        const targetComment = String(comment || '').trim().toLowerCase();
+        const targetVolume = Number(expectedVolume || 0);
+
+        for (let i = 0; i < 6; i++) {
+          const orders = await mtapiOpenedOrders({ base, token });
+          const match = orders.find((order) => {
+            const symbolMatch = order.symbol === targetSymbol;
+            const commentMatch = !targetComment || String(order.comment || '').trim().toLowerCase() === targetComment;
+            const volumeMatch = !targetVolume || Math.abs(Number(order.volume || 0) - targetVolume) < 0.000001;
+            return symbolMatch && commentMatch && volumeMatch;
+          });
+          if (match) return match;
+          await new Promise(resolve => setTimeout(resolve, 1200));
+        }
+
+        throw new Error('MTAPI did not show the trade in open orders after sending it.');
+      };
+
+      const handleExecutionComplete = async () => {
+        setShowExecution(false); setShowDraggableIcon(true);
+        const td = tradeData || {};
+        const symbol = td.symbol || 'XAUUSD';
+        const direction = td.direction || 'BUY';
+        const tp = td.tp || 0;
+        const sl = td.sl || 0;
+        const lotSize = td.lotSize || 0.01;
+        let symbolSettings = null;
+        try {
+          const configuredSymbols = JSON.parse(localStorage.getItem('mobi_ea_quote_symbols') || '[]');
+          symbolSettings = Array.isArray(configuredSymbols)
+            ? configuredSymbols.find((item) => String(item?.symbol || '').toUpperCase() === String(symbol).toUpperCase()) || null
+            : null;
+        } catch {}
+        const preferredPlatform = String(td.platform || symbolSettings?.platform || '').toUpperCase();
+
+        // Send real trade via MTAPI (mt5.mtapi.io / mt4.mtapi.io)
+        const mt5Token = localStorage.getItem('mt_accountId_mt5') || '';
+        const mt4Token = localStorage.getItem('mt_accountId_mt4') || '';
+        const useMt4 = preferredPlatform === 'MT4';
+        const useMt5 = preferredPlatform === 'MT5';
+        const token = useMt4 ? mt4Token : useMt5 ? mt5Token : (mt5Token || mt4Token);
+        const base = useMt4 ? 'https://mt4.mtapi.io' : useMt5 ? 'https://mt5.mtapi.io' : (mt5Token ? 'https://mt5.mtapi.io' : 'https://mt4.mtapi.io');
+
+        if (token) {
+          try {
+            toast({ title: 'Mobi EA Executing...', description: `Sending ${direction} ${symbol} via MTAPI...` });
+            const tradeResult = await mtapiOrderSend({
+              base, token, symbol,
+              operation: direction === 'BUY' ? 'Buy' : 'Sell',
+              volume: lotSize, sl, tp, comment: 'Mobi EA',
+            });
+
+            const verifiedOrder = await verifyMtapiOrder({
+              base,
+              token,
+              symbol,
+              comment: 'Mobi EA',
+              expectedVolume: lotSize,
+            });
+
+            toast({ title: 'Trade Placed by Mobi EA', description: `${direction} ${lotSize} ${symbol} opened successfully${verifiedOrder?.ticket ? ` — ticket ${verifiedOrder.ticket}` : ''}.` });
+            console.log('MTAPI trade result:', tradeResult, 'Verified order:', verifiedOrder);
+            setExecutionLogs(prev => [...prev, { id: Date.now(), time: new Date().toLocaleString(), pair: symbol, action: direction, tp: tp, sl: sl, lot: lotSize, order: verifiedOrder?.ticket ? '#' + verifiedOrder.ticket : '#' + (309304330 + prev.length), comment: 'Mobi EA' }]);
+          } catch (err) {
+            toast({ title: 'Trade Failed', description: err.message, variant: 'destructive' });
+            console.error('MTAPI trade error:', err);
+          }
+        } else {
+          toast({ title: 'No Account Linked', description: preferredPlatform ? `Link your ${preferredPlatform} account in MetaTrader tab to execute ${symbol}.` : 'Link an MT4/MT5 account in MetaTrader tab to execute real trades.', variant: 'destructive' });
+        }
+
+
+        setTradeData(null);
+      };
+
+      const handleSaveSettings = (name,image,video,iconImage) => {
+        const s={...botSettings,name:botSettings.name,image,video,iconImage}; setBotSettings(s); localStorage.setItem('botSettings',JSON.stringify(s));
+        toast({title:"Saved",description:"Settings updated."});
+      };
+
+      const renderContent = () => {
+        switch(activeTab) {
+          case 'home':
+            return interfaceMode==='vip'
+              ? <VIPHomeView eas={eas} selectedEA={selectedEA} setSelectedEA={setSelectedEA} onAddEA={handleAddEA} onRemoveEA={handleRemoveEA} onStartTrading={handleStartTrading} showDraggableIcon={showDraggableIcon} botSettings={botSettings} onOpenSettings={()=>setIsSettingsModalOpen(true)} executionLogs={executionLogs} onColorChange={handleColorChange} themeColor={themeColor} onNavigate={setActiveTab} onStopTrading={handleFullStop} onSwitchMode={m=>{setInterfaceMode(m);localStorage.setItem('interfaceMode',m);}} onEffect={setActiveEffect} onOpenChartAnalyzer={()=>setShowChartAnalyzer(true)}/>
+              : <HomeView eas={eas} selectedEA={selectedEA} setSelectedEA={setSelectedEA} onAddEA={handleAddEA} onRemoveEA={handleRemoveEA} onStartTrading={handleStartTrading} showDraggableIcon={showDraggableIcon||!!tradeDelayTimer} botSettings={botSettings} onOpenSettings={()=>setIsSettingsModalOpen(true)} onColorChange={handleColorChange} themeColor={themeColor} onNavigate={setActiveTab} onStopTrading={handleFullStop} onSwitchMode={m=>{setInterfaceMode(m);localStorage.setItem('interfaceMode',m);}} onEffect={setActiveEffect} onChangePic={img=>{const s={...botSettings,image:img};setBotSettings(s);localStorage.setItem('botSettings',JSON.stringify(s));}} tradeDelaySeconds={tradeDelaySeconds} onOpenChartAnalyzer={()=>setShowChartAnalyzer(true)} isListening={isListening} voiceTranscript={voiceTranscript} onToggleVoice={toggleVoiceListening}/>
+          case 'metatrader': return <MetaTraderView isVIP={interfaceMode==='vip'} themeColor={themeColor}/>;
+          case 'settings': return <SettingsView themeColor={themeColor} onColorChange={handleColorChange} themeName={themeName} currentFont={appFont} onFontChange={handleFontChange} onEffect={setActiveEffect} onOpenSettings={()=>setIsSettingsModalOpen(true)} onOpenChartAnalyzer={()=>setShowChartAnalyzer(true)} botSettings={botSettings} interfaceMode={interfaceMode} onInterfaceModeChange={m=>{setInterfaceMode(m);localStorage.setItem('interfaceMode',m);}} isListening={isListening} voiceTranscript={voiceTranscript} onToggleVoice={toggleVoiceListening}/>;
+          default: return null;
+        }
+      };
+
+      if (!license) {
+        return <SubscribeGate onActivated={handleActivated}/>;
+      }
+
+      return (
+        <div style={{minHeight:'100vh',background:'#080808'}}>
+          <BackgroundSymbolRain themeColor={themeColor}/>
+          {showSplash && <SplashScreen onComplete={()=>setShowSplash(false)}/>}
+          {showDraggableIcon && <DraggableBotIcon image={botSettings.iconImage||botSettings.image} onClose={handleFullStop} onClick={()=>setShowTradePanel(true)} tc={themeColor}/>}
+          <FloatingTradePanel isOpen={showTradePanel} onClose={()=>setShowTradePanel(false)} tc={themeColor}/>
+          {showExecution && <ExecutionFlow onComplete={handleExecutionComplete} tradeData={tradeData}/>}
+          {showBotPopup && <BotStatusPopup botName={botSettings.name} botImage={botSettings.iconImage||botSettings.image} onClose={()=>setShowBotPopup(false)} onRemove={()=>{if(selectedEA)handleRemoveEA(selectedEA.id);}} onStop={handleFullStop} onQuotes={()=>setShowBotPopup(false)} tc={themeColor}/>}
+          <VisualEffectsOverlay effect={activeEffect} onDone={()=>setActiveEffect(null)} themeColor={themeColor}/>
+          <ChartAnalyzer isOpen={showChartAnalyzer} onClose={()=>setShowChartAnalyzer(false)} onExecute={(r,sym)=>{setTradeData({symbol:sym,direction:r.direction,entry:r.entry,tp:r.tp,sl:r.sl,lotSize:r.lotSize});setShowChartAnalyzer(false);setShowExecution(true);setShowDraggableIcon(true);}}/>
+          <ColorPickerPanel isOpen={showColorPicker} onClose={()=>setShowColorPicker(false)} onColorChange={handleColorChange} currentColor={themeName} currentFont={appFont} onFontChange={handleFontChange} onEffect={setActiveEffect}/>
+          <BotSettingsModal isOpen={isSettingsModalOpen} onClose={()=>setIsSettingsModalOpen(false)} currentName={botSettings.name} currentImage={botSettings.image} currentVideo={botSettings.video} currentIconImage={botSettings.iconImage} onSave={handleSaveSettings} interfaceMode={interfaceMode} onInterfaceModeChange={setInterfaceMode}/>
+          <div style={{maxWidth:480,margin:'0 auto',paddingBottom:80}}>{renderContent()}</div>
+          {!showSplash && <BottomNav activeTab={activeTab} onTabChange={setActiveTab} tc={themeColor}/>}
+        </div>
+      );
+    };
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<ToastProvider><App/></ToastProvider>);
+  </script>
+</body>
+</html>
